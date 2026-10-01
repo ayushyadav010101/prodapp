@@ -1808,3 +1808,88 @@ body {
 .zen-challenge-icon { width: 42px !important; height: 42px !important; flex-basis: 42px !important; overflow: hidden; border-radius: 12px !important; }
 .zen-challenge-card-top { gap: .65rem !important; }
 .zen-challenge-card-bottom { gap: .55rem !important; }
+
+/* Final UI tuning: remove the strong side accents and make the cards more compact. */
+.zen-challenge-card {
+  border-left: 1px solid var(--rule) !important;
+  padding: .62rem .7rem .58rem !important;
+  gap: .48rem !important;
+}
+
+.zen-challenge-icon {
+  width: 36px !important;
+  height: 36px !important;
+  flex-basis: 36px !important;
+  border-radius: 10px !important;
+}
+
+.zen-challenge-icon-button {
+  width: 32px !important;
+  height: 32px !important;
+  flex-basis: 32px !important;
+  border-radius: 9px !important;
+}
+
+.zen-challenge-progress-track {
+  height: 7px !important;
+}
+
+.zen-checkin-button {
+  min-width: 108px !important;
+  height: 32px !important;
+  border-radius: 9px !important;
+  font-size: .7rem !important;
+}
+
+@media (max-width: 767px) {
+  .zen-challenge-card {
+    padding: .6rem .65rem .56rem !important;
+    gap: .46rem !important;
+  }
+
+  .zen-challenge-icon {
+    width: 36px !important;
+    height: 36px !important;
+    flex-basis: 36px !important;
+  }
+
+  .zen-challenge-icon-button {
+    width: 30px !important;
+    height: 30px !important;
+    flex-basis: 30px !important;
+    border-radius: 9px !important;
+  }
+
+  .zen-challenge-title-group h3 {
+    font-size: .92rem !important;
+  }
+
+  .zen-challenge-title-group p {
+    font-size: .64rem !important;
+  }
+
+  .zen-checkin-button {
+    min-width: 106px !important;
+    height: 31px !important;
+    padding-inline: .6rem !important;
+    font-size: .66rem !important;
+  }
+}
+
+@media (min-width: 1101px) {
+  .zen-challenge-card {
+    height: 111px !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1100px) {
+  .zen-challenge-card {
+    height: 196px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .zen-challenge-card {
+    height: 195px !important;
+  }
+}

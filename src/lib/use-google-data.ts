@@ -38,6 +38,36 @@ export function useCalendarData() {
   return { calendars, events, syncState, error, refresh };
 }
 
+
+export function useEventCheckInsData() {
+  const { status: sessionStatus } = useSession();
+  const [checkedInKeys, setCheckedInKeys] = useState<string[]>([]);
+  const [syncState, setSyncState] = useState<SyncState>("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    if (sessionStatus !== "authenticated") return;
+    setSyncState("syncing");
+    setError(null);
+    try {
+      const res = await fetch("/api/event-checkins");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to load event check-ins");
+      setCheckedInKeys(Array.isArray(data.keys) ? data.keys : []);
+      setSyncState("idle");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown sync error");
+      setSyncState("error");
+    }
+  }, [sessionStatus]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return { checkedInKeys, setCheckedInKeys, syncState, error, refresh };
+}
+
 export function useTasksData() {
   const { status: sessionStatus } = useSession();
   const [taskLists, setTaskLists] = useState<GoogleTaskList[]>([]);

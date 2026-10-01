@@ -11,10 +11,12 @@ import {
 } from "@/components/icons";
 import {
   useCalendarData,
+  useEventCheckInsData,
   useTasksData,
   useSkillsData,
   useLevelFromData,
 } from "@/lib/use-google-data";
+import { eventCheckInKey, localDateKey } from "@/lib/event-checkins";
 
 const HOME_QUOTE =
   "One day, you'll realize that every dream you had died because you chose comfort over effort, and there will be no one to blame but yourself. That regret will haunt you forever.";
@@ -27,6 +29,7 @@ function getGreeting() {
 export default function HomePage() {
   const { data: session, status } = useSession();
   const { events, error: calError, refresh: refreshEvents } = useCalendarData();
+  const { checkedInKeys: eventCheckInKeys } = useEventCheckInsData();
   const { tasks, error: taskError, refresh: refreshTasks } = useTasksData();
   const { skills } = useSkillsData();
   const [mounted, setMounted] = useState(false);
@@ -45,7 +48,7 @@ export default function HomePage() {
 
   const today = now;
   const todayKey = today.toDateString();
-  const todayIso = today.toISOString().slice(0, 10);
+  const todayIso = localDateKey(today);
   const dateStr = today.toLocaleDateString(undefined, {
     weekday: "long",
     day: "numeric",
@@ -70,20 +73,58 @@ export default function HomePage() {
     [events, todayKey]
   );
 
-  const pendingTaskCount = useMemo(
-    () => tasks.filter((t) => t.status !== "completed").length,
-    [tasks]
+  const todaysTasks = useMemo(
+    () =>
+      tasks.filter((task) => {
+        if (!task.due) return false;
+        return new Date(task.due).toDateString() === todayKey;
+      }),
+    [tasks, todayKey]
   );
 
-  // Home shows how many challenge records the user has, not only challenges
-  // whose date window happens to include today. Completed/expired challenges
-  // still belong to the user's challenge history.
-  const challengeCount = skills.length;
+  const todayChallenges = useMemo(
+    () =>
+      skills.filter((skill) => {
+        const start = new Date(skill.startDate);
+        if (Number.isNaN(start.getTime())) return false;
+        const startDay = new Date(start);
+        startDay.setHours(0, 0, 0, 0);
+        const endDay = new Date(startDay);
+        endDay.setDate(endDay.getDate() + skill.durationDays);
+        const todayStart = new Date(today);
+        todayStart.setHours(0, 0, 0, 0);
+        return todayStart >= startDay && todayStart < endDay;
+      }),
+    [skills, todayKey]
+  );
 
-  const completedTasksToday = tasks.filter(
-    (t) => t.status === "completed" && t.completed && new Date(t.completed).toDateString() === todayKey
-  ).length;
-  const completedChallengesToday = skills.filter((s) => s.completedDates.includes(todayIso)).length;
+  // The Home card now represents today's workload rather than every task in
+  // every Google Task list.
+  const todayTaskCount = todaysTasks.length;
+  const challengeCount = todayChallenges.length;
+
+  const todayEventKeys = useMemo(
+    () =>
+      events
+        .map((event) => {
+          const raw = event.start?.dateTime ?? event.start?.date;
+          if (!raw) return null;
+          const eventDate = event.start?.date
+            ? new Date(`${event.start.date}T00:00:00`)
+            : new Date(raw);
+          if (Number.isNaN(eventDate.getTime()) || eventDate.toDateString() !== todayKey) return null;
+          return eventCheckInKey(event.id, localDateKey(eventDate));
+        })
+        .filter((key): key is string => Boolean(key)),
+    [events, todayKey]
+  );
+
+  const completedEventsToday = todayEventKeys.filter((key) => eventCheckInKeys.includes(key)).length;
+  const completedTasksToday = todaysTasks.filter((t) => t.status === "completed").length;
+  const completedChallengesToday = todayChallenges.filter((s) => s.completedDates.includes(todayIso)).length;
+  const progressTotal = todayEventKeys.length + todaysTasks.length + todayChallenges.length;
+  const progressCompleted = completedEventsToday + completedTasksToday + completedChallengesToday;
+  const todayProgress = progressTotal > 0 ? Math.min(100, Math.round((progressCompleted / progressTotal) * 100)) : 0;
   const { level } = useLevelFromData(events, tasks, skills);
   if (status === "unauthenticated") {
     return (
@@ -127,6 +168,29 @@ export default function HomePage() {
           </div>
 
           <div className="mt-5 pt-4 sm:mt-6 sm:pt-5 border-t border-rule">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-ink-soft font-semibold">Today Progress</p>
+              <span className="text-sm sm:text-base font-semibold tabular-nums">{todayProgress}%</span>
+            </div>
+            <div
+              className="mt-2.5 h-3 sm:h-3.5 w-full overflow-hidden rounded-full bg-rule/35"
+              role="progressbar"
+              aria-label="Today Progress"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={todayProgress}
+            >
+              <div
+                className="h-full rounded-full bg-accent transition-[width] duration-500 ease-out"
+                style={{ width: `${todayProgress}%` }}
+              />
+            </div>
+            <p className="mt-1.5 text-[10px] sm:text-xs text-ink-soft">
+              {progressTotal > 0 ? `${progressCompleted} of ${progressTotal} done today` : "No tasks, events, or challenges today"}
+            </p>
+          </div>
+
+          <div className="mt-4 pt-4 sm:mt-5 sm:pt-5 border-t border-rule">
             <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-ink-soft font-semibold">Current level</p>
             <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1 mt-1">
               <p className="font-serif text-5xl sm:text-6xl md:text-7xl font-bold leading-none tabular-nums">{level}</p>
@@ -145,9 +209,9 @@ export default function HomePage() {
           <HomeCountCard
             href="/tasks"
             icon={<IconTasks className="w-6 h-6 sm:w-7 sm:h-7" />}
-            label="Tasks"
-            count={pendingTaskCount}
-            noun={pendingTaskCount === 1 ? "task" : "tasks"}
+            label="Today's Tasks"
+            count={todayTaskCount}
+            noun={todayTaskCount === 1 ? "task" : "tasks"}
           />
           <HomeCountCard
             href="/skills"
@@ -187,6 +251,7 @@ export default function HomePage() {
         </div>
         <div className="hidden sm:flex px-4 sm:px-5 md:px-6 pb-3.5 sm:pb-4 text-[10px] sm:text-xs text-ink-soft flex-wrap gap-x-4 gap-y-1.5">
           <span>{completedTasksToday} task{completedTasksToday === 1 ? "" : "s"} completed today</span>
+          <span>{completedEventsToday} event{completedEventsToday === 1 ? "" : "s"} checked in</span>
           <span>{completedChallengesToday} challenge check-in{completedChallengesToday === 1 ? "" : "s"}</span>
         </div>
       </section>

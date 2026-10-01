@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
-import { useCalendarData } from "@/lib/use-google-data";
+import { useCalendarData, useEventCheckInsData } from "@/lib/use-google-data";
 import { SyncStatus } from "@/components/SyncStatus";
 import { MonthCalendarGrid } from "@/components/MonthCalendarGrid";
 import { IconTrash, IconPencil, IconCalendar, IconSun, IconClock } from "@/components/icons";
 import type { GoogleEvent } from "@/lib/google-api";
 import { getEventMeta } from "@/lib/calendarColors";
+import { eventCheckInKey, localDateKey } from "@/lib/event-checkins";
 
 function getEventDate(event: GoogleEvent): Date | null {
   const date = event.start?.date;
@@ -45,6 +46,7 @@ function dateHeading(d: Date) {
 export default function CalendarPage() {
   const { status: sessionStatus } = useSession();
   const { events, calendars, syncState, error, refresh } = useCalendarData();
+  const { checkedInKeys, setCheckedInKeys } = useEventCheckInsData();
   const [view, setView] = useState<"Today" | "Week" | "Month">("Month");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -55,6 +57,7 @@ export default function CalendarPage() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [checkingInEventKey, setCheckingInEventKey] = useState<string | null>(null);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [editEventTitle, setEditEventTitle] = useState("");
   const [editingEventSavingId, setEditingEventSavingId] = useState<string | null>(null);
@@ -256,6 +259,33 @@ export default function CalendarPage() {
     }
   };
 
+  const toggleEventCheckIn = async (event: GoogleEvent, eventDate: Date) => {
+    const dateKey = localDateKey(eventDate);
+    const key = eventCheckInKey(event.id, dateKey);
+    const checked = checkedInKeys.includes(key);
+    setCheckingInEventKey(key);
+    setCheckedInKeys((current) =>
+      checked ? current.filter((value) => value !== key) : [...current, key]
+    );
+
+    try {
+      const res = await fetch("/api/event-checkins", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventId: event.id, dateKey, checked: !checked }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to update event check-in");
+    } catch {
+      setCheckedInKeys((current) =>
+        checked ? [...current, key] : current.filter((value) => value !== key)
+      );
+      setFormError("Couldn't update the event check-in. Try again.");
+    } finally {
+      setCheckingInEventKey(null);
+    }
+  };
+
   const deleteEventItem = async (eventId: string, calendarId?: string) => {
     if (!confirm("Delete this event? This cannot be undone.")) return;
     setDeletingId(eventId);
@@ -451,6 +481,8 @@ export default function CalendarPage() {
               const expired = isExpiredEvent(event, evDate);
               const previous = rangedEvents[index - 1];
               const isNewDate = !previous || previous.date.toDateString() !== evDate.toDateString();
+              const checkInKey = eventCheckInKey(event.id, localDateKey(evDate));
+              const checkedIn = checkedInKeys.includes(checkInKey);
 
               return (
                 <div key={event.id}>
@@ -461,13 +493,10 @@ export default function CalendarPage() {
                   )}
 
                   <div
-                    className={`list-none flex items-center gap-3 rounded-2xl border overflow-hidden px-4 py-2 md:px-5 md:py-2.5 min-h-[62px] md:min-h-[68px] ${
-                      expired ? "bg-[#e6e6e8] border-[#d4d4d6]" : "bg-paper-raised border-rule"
-                    }`}
+                    className="list-none flex items-center gap-2.5 rounded-2xl border border-rule overflow-hidden px-3 py-2 md:px-4 md:py-2 min-h-[46px] md:min-h-[51px]"
                     style={{
-                      borderLeft: `4px solid ${expired ? "#9da0a6" : color}`,
                       backgroundColor: expired
-                        ? "#e5e5e7"
+                        ? "color-mix(in srgb, var(--ink) 10%, var(--paper-raised))"
                         : `color-mix(in srgb, ${color} 7%, var(--paper-raised))`,
                     }}
                   >
@@ -541,17 +570,31 @@ export default function CalendarPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1 shrink-0">
-                      {expired && <span className="text-xs text-[#77797f] mr-1">Expired</span>}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {expired && <span className="hidden sm:inline text-[10px] md:text-xs text-ink-soft mr-0.5">Expired</span>}
+                      <button
+                        type="button"
+                        onClick={() => toggleEventCheckIn(event, evDate)}
+                        disabled={checkingInEventKey === checkInKey || deletingId === event.id || editingEventSavingId === event.id}
+                        className={`min-w-[68px] h-7 md:h-8 px-2.5 rounded-lg border text-[10px] md:text-[11px] font-semibold transition-colors disabled:opacity-40 ${
+                          checkedIn
+                            ? "border-[#4aa862] bg-[#4aa862]/10 text-[#4aa862]"
+                            : "border-rule text-ink-soft hover:border-accent hover:text-accent"
+                        }`}
+                        aria-pressed={checkedIn}
+                        aria-label={checkedIn ? "Undo event check-in" : "Check in event"}
+                      >
+                        {checkedIn ? "✓ Done" : "Check in"}
+                      </button>
                       <button
                         type="button"
                         onClick={() => deleteEventItem(event.id, event.calendarId)}
-                        disabled={deletingId === event.id || editingEventSavingId === event.id}
-                        className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-ink-soft/60 hover:text-red-600 hover:bg-paper transition-colors disabled:opacity-40"
+                        disabled={deletingId === event.id || editingEventSavingId === event.id || checkingInEventKey === checkInKey}
+                        className="w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-ink-soft/60 hover:text-red-600 hover:bg-paper transition-colors disabled:opacity-40"
                         aria-label={expired ? "Delete expired event" : "Delete event"}
                         title={expired ? "Delete expired event" : "Delete event"}
                       >
-                        <IconTrash className="w-4 h-4" />
+                        <IconTrash className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>

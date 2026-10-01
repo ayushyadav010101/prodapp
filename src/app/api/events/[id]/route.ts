@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { deleteEvent, patchEvent, GoogleApiError } from "@/lib/google-api";
+import { removeEventCheckIns } from "@/lib/event-checkins-sync";
 
 export async function PATCH(
   req: NextRequest,
@@ -45,6 +46,7 @@ export async function DELETE(
 
   try {
     await deleteEvent(session.accessToken, calendarId, id);
+    await removeEventCheckIns(session.accessToken, id);
     return NextResponse.json({ ok: true });
   } catch (err) {
     if (err instanceof GoogleApiError) {
