@@ -2767,7 +2767,7 @@ body {
 @media (min-width: 1101px) {
   .zen-challenge-progress-block {
     position: relative !important;
-    top: 14px !important;
+    top: 30px !important;
     transform: none !important;
   }
 
@@ -2786,7 +2786,7 @@ body {
 @media (max-width: 767px) {
   .zen-challenge-progress-block {
     position: relative !important;
-    top: 4px !important;
+    top: 20px !important;
     transform: none !important;
   }
 
