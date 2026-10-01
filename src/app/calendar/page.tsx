@@ -45,7 +45,7 @@ function dateHeading(d: Date) {
 export default function CalendarPage() {
   const { status: sessionStatus } = useSession();
   const { events, calendars, syncState, error, refresh } = useCalendarData();
-  const [view, setView] = useState<"Day" | "Week" | "Month">("Month");
+  const [view, setView] = useState<"Today" | "Week" | "Month">("Today");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
@@ -56,6 +56,7 @@ export default function CalendarPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [todayKey, setTodayKey] = useState(() => new Date().toDateString());
+  const [calendarResetKey, setCalendarResetKey] = useState(0);
 
   useEffect(() => {
     const updateToday = () => setTodayKey(new Date().toDateString());
@@ -65,6 +66,9 @@ export default function CalendarPage() {
 
   const rangedEvents = useMemo(() => {
     let list: { event: GoogleEvent; date: Date }[];
+    const now = new Date();
+    const startOfToday = new Date(now);
+    startOfToday.setHours(0, 0, 0, 0);
 
     if (selectedDate) {
       list = events
@@ -73,19 +77,32 @@ export default function CalendarPage() {
           (x): x is { event: GoogleEvent; date: Date } =>
             x.date !== null && x.date.toDateString() === selectedDate.toDateString()
         );
-    } else {
-      const now = new Date();
-      const days = view === "Day" ? 1 : view === "Week" ? 7 : 31;
-      const windowStart = new Date(now);
-      windowStart.setHours(0, 0, 0, 0);
-      const windowEnd = new Date(now);
-      windowEnd.setDate(now.getDate() + days);
+    } else if (view === "Week") {
+      const weekStart = new Date(startOfToday);
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 7);
 
       list = events
         .map((e) => ({ event: e, date: getEventDate(e) }))
         .filter(
           (x): x is { event: GoogleEvent; date: Date } =>
-            x.date !== null && x.date >= windowStart && x.date <= windowEnd
+            x.date !== null && x.date >= weekStart && x.date < weekEnd
+        );
+    } else {
+      // Today and Month both keep the month overview visible. Include the
+      // previous day so an event that just expired remains visible as context.
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      monthStart.setDate(monthStart.getDate() - 1);
+      monthStart.setHours(0, 0, 0, 0);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      monthEnd.setHours(0, 0, 0, 0);
+
+      list = events
+        .map((e) => ({ event: e, date: getEventDate(e) }))
+        .filter(
+          (x): x is { event: GoogleEvent; date: Date } =>
+            x.date !== null && x.date >= monthStart && x.date < monthEnd
         );
     }
 
@@ -104,11 +121,27 @@ export default function CalendarPage() {
 
   const rangeLabel = selectedDate
     ? dateHeading(selectedDate)
-    : view === "Day"
-    ? "Today"
     : view === "Week"
     ? "This Week"
     : "This Month";
+
+  const isExpiredEvent = (event: GoogleEvent, date: Date) => {
+    const dateTime = event.start?.dateTime;
+    if (dateTime) return new Date(dateTime).getTime() < Date.now();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date.getTime() < today.getTime();
+  };
+
+  const dateHeadingLong = (date: Date) =>
+    date
+      .toLocaleDateString(undefined, {
+        weekday: "short",
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+      .toUpperCase();
 
   const addEvent = async () => {
     if (!title.trim() || !date || saving) return;
@@ -215,30 +248,49 @@ export default function CalendarPage() {
         </div>
       </header>
 
-      <div className="flex flex-wrap items-center gap-1 md:gap-1.5 rounded-full border border-rule p-0.5 md:p-1 w-fit text-[10px] md:text-xs uppercase tracking-widest">
-        {(["Month", "Day", "Week"] as const).map((v) => (
-          <button
-            key={v}
-            onClick={() => {
-              setView(v);
-              setSelectedDate(null);
-            }}
-            className={`flex items-center gap-1 md:gap-1.5 rounded-full px-2.5 py-1 md:px-3.5 md:py-1.5 transition-colors ${
-              !selectedDate && view === v
-                ? "bg-accent text-paper font-semibold"
-                : "text-ink-soft hover:text-ink"
-            }`}
-          >
-            <IconCalendar className="w-3 h-3 md:w-3.5 md:h-3.5" />
-            {v}
-          </button>
-        ))}
+      <div className="grid grid-cols-3 gap-0 rounded-full border border-rule p-0.5 w-full text-[11px] md:text-sm uppercase tracking-widest">
         <button
-          onClick={() => setSelectedDate(null)}
-          className="flex items-center gap-1 md:gap-1.5 rounded-full px-2.5 py-1 md:px-3.5 md:py-1.5 text-ink-soft hover:text-ink transition-colors"
+          onClick={() => {
+            setView("Today");
+            setSelectedDate(null);
+            setCalendarResetKey((value) => value + 1);
+          }}
+          className={`flex items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 transition-colors ${
+            view === "Today" && !selectedDate
+              ? "bg-accent text-paper font-semibold"
+              : "text-ink-soft hover:text-ink"
+          }`}
         >
-          <IconSun className="w-3 h-3 md:w-3.5 md:h-3.5" />
+          <IconSun className="w-4 h-4 md:w-5 md:h-5" />
           Today
+        </button>
+        <button
+          onClick={() => {
+            setView("Week");
+            setSelectedDate(null);
+          }}
+          className={`flex items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 transition-colors ${
+            view === "Week" && !selectedDate
+              ? "bg-accent text-paper font-semibold"
+              : "text-ink-soft hover:text-ink"
+          }`}
+        >
+          <IconCalendar className="w-4 h-4 md:w-5 md:h-5" />
+          Week
+        </button>
+        <button
+          onClick={() => {
+            setView("Month");
+            setSelectedDate(null);
+          }}
+          className={`flex items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 transition-colors ${
+            view === "Month" && !selectedDate
+              ? "bg-accent text-paper font-semibold"
+              : "text-ink-soft hover:text-ink"
+          }`}
+        >
+          <IconCalendar className="w-4 h-4 md:w-5 md:h-5" />
+          Month
         </button>
       </div>
 
@@ -301,11 +353,23 @@ export default function CalendarPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_260px] gap-3 md:gap-8 items-start">
-        <div className="order-2 md:order-1 min-w-0">
+      <div className="flex flex-col gap-4 md:gap-6">
+        <div className="order-1">
+          <MonthCalendarGrid
+            key={`${view}-${calendarResetKey}`}
+            events={events}
+            calendars={calendars}
+            selectedDate={selectedDate ?? new Date()}
+            onSelectDate={(d) =>
+              setSelectedDate((cur) => (cur && cur.toDateString() === d.toDateString() ? null : d))
+            }
+          />
+        </div>
+
+        <div className="order-2 min-w-0">
           <div className="flex items-center justify-between mb-2 md:mb-3">
-            <h2 className="font-serif text-base md:text-xl font-semibold">{rangeLabel}</h2>
-            <span className="text-[10px] md:text-xs text-ink-soft">
+            <h2 className="font-serif text-2xl md:text-3xl font-semibold">{rangeLabel}</h2>
+            <span className="text-xs md:text-sm text-ink-soft">
               {rangedEvents.length} event{rangedEvents.length === 1 ? "" : "s"}
             </span>
           </div>
@@ -320,80 +384,79 @@ export default function CalendarPage() {
             </div>
           )}
 
-          <ul className="space-y-1.5 md:space-y-2.5">
-            {rangedEvents.map(({ event, date: evDate }) => {
+          <div className="space-y-3.5 md:space-y-5">
+            {rangedEvents.map(({ event, date: evDate }, index) => {
               const { label, color } = getEventMeta(event, calendars);
-              const isToday = evDate.toDateString() === todayKey;
+              const expired = isExpiredEvent(event, evDate);
+              const previous = rangedEvents[index - 1];
+              const isNewDate = !previous || previous.date.toDateString() !== evDate.toDateString();
+
               return (
-                <li
-                  key={event.id}
-                  className="flex items-stretch gap-2 md:gap-3 rounded-xl md:rounded-2xl border border-rule bg-paper-raised pr-2 md:pr-3 overflow-hidden group"
-                  style={{ borderLeft: `4px solid ${color}` }}
-                >
-                  <div className="flex flex-col items-center justify-center px-2 py-2 md:px-3 md:py-3 min-w-[46px] md:min-w-[64px] text-center">
-                    <span className="text-[8px] md:text-[10px] uppercase tracking-widest text-ink-soft">
-                      {evDate.toLocaleDateString(undefined, { weekday: "short" })}
-                    </span>
-                    <span className="font-serif text-base md:text-2xl font-semibold leading-none my-0.5">
-                      {evDate.getDate()}
-                    </span>
-                    <span className="text-[8px] md:text-[10px] uppercase tracking-widest text-ink-soft">
-                      {evDate.toLocaleDateString(undefined, { month: "short" })}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0 py-1.5 md:py-3 flex flex-col justify-center gap-1 md:gap-1.5">
-                    <p className="font-semibold text-xs md:text-sm truncate">{event.summary || "(No title)"}</p>
-                    <div className="flex items-center gap-1.5 md:gap-2 flex-wrap text-[10px] md:text-xs text-ink-soft">
-                      <span className="flex items-center gap-1 md:gap-1.5">
-                        {isToday && (
-                          <span className="relative flex w-1.5 h-1.5 md:w-2 md:h-2 shrink-0">
-                            <span
-                              className="absolute inset-0 rounded-full animate-ping"
-                              style={{ backgroundColor: "#3b82f6" }}
-                            />
-                            <span
-                              className="relative w-1.5 h-1.5 md:w-2 md:h-2 rounded-full"
-                              style={{ backgroundColor: "#3b82f6" }}
-                            />
-                          </span>
-                        )}
+                <div key={event.id}>
+                  {isNewDate && (
+                    <p className="mb-1.5 px-2 text-[11px] md:text-xs uppercase tracking-[0.16em] font-semibold text-ink-soft">
+                      {dateHeadingLong(evDate)}
+                    </p>
+                  )}
+
+                  <div
+                    className={`list-none flex items-center gap-3 rounded-2xl border overflow-hidden px-4 py-3 md:px-5 md:py-3.5 min-h-[76px] md:min-h-[84px] ${
+                      expired ? "bg-[#e6e6e8] border-[#d4d4d6]" : "bg-paper-raised border-rule"
+                    }`}
+                    style={{
+                      borderLeft: `4px solid ${expired ? "#9da0a6" : color}`,
+                      backgroundColor: expired
+                        ? "#e5e5e7"
+                        : `color-mix(in srgb, ${color} 7%, var(--paper-raised))`,
+                    }}
+                  >
+                    <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+                      <p
+                        className={`font-semibold text-sm md:text-base truncate ${
+                          expired ? "text-[#76787d] line-through decoration-1" : "text-ink"
+                        }`}
+                      >
+                        {event.summary || "(No title)"}
+                      </p>
+                      <div className="flex items-center gap-2 flex-wrap text-xs md:text-sm text-ink-soft">
                         <span
-                          className="rounded-full px-1.5 py-0.5 md:px-2 text-[9px] md:text-[10px] font-medium"
-                          style={{ backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`, color }}
+                          className="rounded-lg px-2 py-1 font-medium"
+                          style={{
+                            backgroundColor: expired
+                              ? "rgba(128, 128, 128, 0.12)"
+                              : `color-mix(in srgb, ${color} 13%, transparent)`,
+                            color: expired ? "#7b7d82" : color,
+                          }}
                         >
                           {label}
                         </span>
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <IconClock className="w-2.5 h-2.5 md:w-3 md:h-3" />
-                        {formatEventTime(event)}
-                        {event.recurringEventId && " · Recurring"}
-                      </span>
+                        <span className="flex items-center gap-1.5">
+                          <IconClock className="w-3.5 h-3.5" />
+                          {formatEventTime(event)}
+                        </span>
+                      </div>
                     </div>
+
+                    {expired ? (
+                      <div className="flex items-center gap-1.5 text-sm text-[#77797f] shrink-0">
+                        <IconCalendar className="w-4 h-4" />
+                        <span className="hidden sm:inline">Expired</span>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => deleteEventItem(event.id, event.calendarId)}
+                        disabled={deletingId === event.id}
+                        className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-ink-soft/60 hover:text-red-600 hover:bg-paper transition-colors shrink-0"
+                        aria-label="Delete event"
+                      >
+                        <IconTrash className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
-                  <button
-                    onClick={() => deleteEventItem(event.id, event.calendarId)}
-                    disabled={deletingId === event.id}
-                    className="self-center w-6 h-6 md:w-9 md:h-9 rounded-full flex items-center justify-center text-ink-soft/50 hover:text-red-600 hover:bg-paper transition-colors shrink-0"
-                    aria-label="Delete event"
-                  >
-                    <IconTrash className="w-3 h-3 md:w-4.5 md:h-4.5" />
-                  </button>
-                </li>
+                </div>
               );
             })}
-          </ul>
-        </div>
-
-        <div className="order-1 md:order-2 md:sticky md:top-10 min-w-0">
-          <MonthCalendarGrid
-            events={events}
-            calendars={calendars}
-            selectedDate={selectedDate ?? new Date()}
-            onSelectDate={(d) =>
-              setSelectedDate((cur) => (cur && cur.toDateString() === d.toDateString() ? null : d))
-            }
-          />
+          </div>
         </div>
       </div>
     </div>
