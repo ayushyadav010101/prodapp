@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useLevel, useTasksData } from "@/lib/use-google-data";
+import { localDateKey } from "@/lib/event-checkins";
 import { SyncStatus } from "@/components/SyncStatus";
 import {
   IconShare,
@@ -71,7 +72,11 @@ export default function TasksPage() {
       const res = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTaskTitle.trim(), taskListId }),
+        body: JSON.stringify({
+          title: newTaskTitle.trim(),
+          taskListId,
+          ...(taskListId === taskLists[0]?.id ? { todayDateKey: localDateKey(new Date()) } : {}),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to create task");

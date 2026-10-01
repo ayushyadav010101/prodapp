@@ -30,7 +30,7 @@ export default function HomePage() {
   const { data: session, status } = useSession();
   const { events, error: calError, refresh: refreshEvents } = useCalendarData();
   const { checkedInKeys: eventCheckInKeys } = useEventCheckInsData();
-  const { tasks, error: taskError, refresh: refreshTasks } = useTasksData();
+  const { tasks, todayTaskIds, error: taskError, refresh: refreshTasks } = useTasksData();
   const { skills } = useSkillsData();
   const [mounted, setMounted] = useState(false);
   const [now, setNow] = useState(() => new Date());
@@ -74,12 +74,8 @@ export default function HomePage() {
   );
 
   const todaysTasks = useMemo(
-    () =>
-      tasks.filter((task) => {
-        if (!task.due) return false;
-        return new Date(task.due).toDateString() === todayKey;
-      }),
-    [tasks, todayKey]
+    () => tasks.filter((task) => todayTaskIds.includes(task.id)),
+    [tasks, todayTaskIds]
   );
 
   const todayChallenges = useMemo(

@@ -72,6 +72,7 @@ export function useTasksData() {
   const { status: sessionStatus } = useSession();
   const [taskLists, setTaskLists] = useState<GoogleTaskList[]>([]);
   const [tasks, setTasks] = useState<GoogleTask[]>([]);
+  const [todayTaskIds, setTodayTaskIds] = useState<string[]>([]);
   const [syncState, setSyncState] = useState<SyncState>("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -85,6 +86,7 @@ export function useTasksData() {
       if (!res.ok) throw new Error(data.error ?? "Failed to load tasks");
       setTaskLists(data.taskLists ?? []);
       setTasks(data.tasks ?? []);
+      setTodayTaskIds(Array.isArray(data.todayTaskIds) ? data.todayTaskIds : []);
       setSyncState("idle");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown sync error");
@@ -96,7 +98,7 @@ export function useTasksData() {
     refresh();
   }, [refresh]);
 
-  return { taskLists, tasks, syncState, error, refresh };
+  return { taskLists, tasks, todayTaskIds, syncState, error, refresh };
 }
 
 export function useSkillsData() {

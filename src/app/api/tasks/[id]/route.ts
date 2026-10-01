@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { patchTask, deleteTask, GoogleApiError } from "@/lib/google-api";
+import { removeTodayTaskRecord } from "@/lib/today-task-sync";
 
 export async function PATCH(
   req: NextRequest,
@@ -54,6 +55,13 @@ export async function DELETE(
 
   try {
     await deleteTask(session.accessToken, taskListId, id);
+    try {
+      await removeTodayTaskRecord(session.accessToken, id);
+    } catch (err) {
+      // The Google task is already deleted; cleanup of the auxiliary log is
+      // best-effort so the user does not see a false deletion failure.
+      console.error("Failed to remove today-task log", err);
+    }
     return NextResponse.json({ ok: true });
   } catch (err) {
     if (err instanceof GoogleApiError) {
