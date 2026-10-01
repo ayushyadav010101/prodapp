@@ -2559,3 +2559,192 @@ body {
     flex-basis: 28px !important;
   }
 }
+
+/* ============================================================
+   ZenSpace final card geometry correction
+   - 20% taller desktop cards (120px -> 144px)
+   - Rebalanced internal rows so avatar/actions/progress/streak/check-in
+     have dedicated space instead of crowding each other
+   - Thicker progress track
+   - Compact mobile geometry keeps three challenges visible by default
+   ============================================================ */
+@media (min-width: 1101px) {
+  .zen-challenge-card {
+    height: 144px !important;
+    min-height: 144px !important;
+    max-height: 144px !important;
+    padding: 0.65rem 0.8rem 0.6rem !important;
+    grid-template-columns: 62px minmax(0, 1fr) 136px !important;
+    grid-template-rows: 56px minmax(0, 1fr) 30px !important;
+    column-gap: 0.75rem !important;
+    row-gap: 0.3rem !important;
+    overflow: hidden;
+  }
+
+  .zen-challenge-identity {
+    gap: 0.7rem !important;
+    align-self: center !important;
+  }
+
+  .zen-challenge-icon {
+    width: 54px !important;
+    height: 54px !important;
+    flex-basis: 54px !important;
+    border-radius: 12px !important;
+  }
+
+  .zen-challenge-title-group h3 {
+    font-size: 1.15rem !important;
+    line-height: 1.05 !important;
+  }
+
+  .zen-challenge-title-group p {
+    margin-top: 0.28rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .zen-challenge-actions {
+    gap: 0.45rem !important;
+    align-self: center !important;
+  }
+
+  .zen-challenge-icon-button {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+  }
+
+  .zen-challenge-progress-block {
+    align-self: stretch !important;
+    justify-content: center !important;
+    padding: 0.05rem 0 !important;
+  }
+
+  .zen-challenge-progress-meta {
+    margin-bottom: 0.3rem !important;
+    font-size: 0.68rem !important;
+    line-height: 1 !important;
+  }
+
+  .zen-challenge-progress-track {
+    height: 12px !important;
+    border-radius: 999px !important;
+  }
+
+  .zen-challenge-card-bottom {
+    align-items: center !important;
+  }
+
+  .zen-challenge-streak {
+    gap: 0.35rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  .zen-challenge-flame {
+    font-size: 1.15rem !important;
+  }
+
+  .zen-challenge-streak-number {
+    font-size: 0.92rem !important;
+  }
+
+  .zen-checkin-button {
+    width: 132px !important;
+    height: 32px !important;
+    border-radius: 0.45rem !important;
+    font-size: 0.7rem !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .zen-challenge-card {
+    min-height: 132px !important;
+    height: 132px !important;
+    max-height: 132px !important;
+    padding: 0.65rem 0.7rem 0.6rem !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-rows: 38px minmax(0, 1fr) 27px !important;
+    column-gap: 0.5rem !important;
+    row-gap: 0.25rem !important;
+    overflow: hidden !important;
+  }
+
+  .zen-challenge-identity {
+    gap: 0.55rem !important;
+    align-self: center !important;
+  }
+
+  .zen-challenge-icon {
+    width: 36px !important;
+    height: 36px !important;
+    flex-basis: 36px !important;
+    border-radius: 10px !important;
+  }
+
+  .zen-challenge-title-group h3 {
+    font-size: 0.9rem !important;
+    line-height: 1.1 !important;
+  }
+
+  .zen-challenge-title-group p {
+    font-size: 0.62rem !important;
+    margin-top: 0.12rem !important;
+  }
+
+  .zen-challenge-actions {
+    gap: 0.35rem !important;
+    align-self: center !important;
+  }
+
+  .zen-challenge-icon-button {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 9px !important;
+  }
+
+  .zen-challenge-icon-button svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  .zen-challenge-progress-block {
+    margin-top: 0.05rem !important;
+    justify-content: center !important;
+  }
+
+  .zen-challenge-progress-meta {
+    font-size: 0.6rem !important;
+    margin-bottom: 0.2rem !important;
+  }
+
+  .zen-challenge-progress-track {
+    height: 8px !important;
+    border-radius: 999px !important;
+  }
+
+  .zen-challenge-card-bottom {
+    margin-top: 0 !important;
+    align-items: center !important;
+  }
+
+  .zen-challenge-streak {
+    gap: 0.22rem !important;
+    font-size: 0.62rem !important;
+  }
+
+  .zen-challenge-streak-number {
+    font-size: 0.82rem !important;
+  }
+
+  .zen-challenge-flame {
+    font-size: 0.95rem !important;
+  }
+
+  .zen-checkin-button {
+    width: 104px !important;
+    height: 27px !important;
+    padding: 0 0.45rem !important;
+    border-radius: 8px !important;
+    font-size: 0.6rem !important;
+  }
+}
