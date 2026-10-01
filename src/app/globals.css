@@ -2766,3 +2766,38 @@ body {
 .zen-challenge-progress-meta {
   transform: translateY(8px) !important;
 }
+
+/* ================================================================
+   ZENSPACE — FINAL PROGRESS POSITION TUNING
+   Keep the current card geometry, but give the progress labels and
+   track a cleaner vertical relationship on desktop + mobile.
+   ================================================================ */
+@media (min-width: 1101px) {
+  .zen-challenge-progress-block {
+    transform: translateY(6px) !important;
+  }
+
+  .zen-challenge-progress-meta {
+    margin-bottom: .48rem !important;
+  }
+
+  .zen-challenge-progress-track {
+    transform: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .zen-challenge-progress-block {
+    margin-top: .45rem !important;
+    transform: none !important;
+  }
+
+  .zen-challenge-progress-meta {
+    margin-bottom: .42rem !important;
+    line-height: 1.1 !important;
+  }
+
+  .zen-challenge-progress-track {
+    transform: none !important;
+  }
+}
