@@ -1041,6 +1041,13 @@ body {
     gap: 0.8rem;
   }
 
+  /* Match the position marked in the reference image: keep the
+     Progress label where it is, but move only the progress track
+     down into the lower open area of the card. */
+  .zen-challenge-progress-track {
+    transform: translateY(20px) !important;
+  }
+
   .zen-challenge-card {
     height: 120px !important;
     min-height: 120px !important;
