@@ -19,6 +19,10 @@ import {
 const HOME_QUOTE =
   "One day, you'll realize that every dream you had died because you chose comfort over effort, and there will be no one to blame but yourself. That regret will haunt you forever.";
 
+function getGreeting() {
+  const hour = new Date().getHours();
+  return hour < 5 ? "Night" : hour < 12 ? "Morning" : hour < 17 ? "Afternoon" : hour < 21 ? "Evening" : "Night";
+}
 
 export default function HomePage() {
   const { data: session, status } = useSession();
@@ -26,15 +30,36 @@ export default function HomePage() {
   const { tasks, error: taskError, refresh: refreshTasks } = useTasksData();
   const { skills } = useSkillsData();
   const [mounted, setMounted] = useState(false);
+  const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 30);
     return () => clearTimeout(t);
   }, []);
 
-  const today = new Date();
+  // Keep the dashboard date/current-day counts fresh while the app stays open.
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const today = now;
   const todayKey = today.toDateString();
   const todayIso = today.toISOString().slice(0, 10);
+  const dateStr = today.toLocaleDateString(undefined, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  const avatarUrl = session?.user?.image ?? "";
+  const avatarInitials = (session?.user?.name ?? "U")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
   const todaysEventCount = useMemo(
     () =>
       events.filter((e) => {
@@ -78,12 +103,30 @@ export default function HomePage() {
   return (
     <div className="max-w-6xl mx-auto px-3 sm:px-5 md:px-6 py-3 sm:py-5 md:py-5 pb-20 md:pb-5">
       <div className={`grid gap-3 md:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(290px,0.8fr)] transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
-        <section aria-label="Your progress" className="rounded-2xl sm:rounded-[1.9rem] border border-rule bg-paper-raised p-4 sm:p-5 md:p-6 md:min-h-[300px] flex flex-col justify-between">
-          <div>
-            <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-accent font-semibold">Your progress</p>
-            <h1 className="font-serif text-xl sm:text-2xl md:text-3xl font-semibold mt-1">Keep showing up.</h1>
+        <section aria-label="Your profile and progress" className="rounded-2xl sm:rounded-[1.9rem] border border-rule bg-paper-raised p-4 sm:p-5 md:p-6 md:min-h-[300px] flex flex-col justify-between">
+          <div className="flex items-start gap-3 sm:gap-5 min-w-0">
+            <div className="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl sm:rounded-[1.2rem] bg-[#efe6cf] border border-rule shadow-sm overflow-hidden flex items-center justify-center shrink-0">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={`${session?.user?.name ?? "User"}'s profile`}
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <span className="font-serif text-xl sm:text-2xl md:text-3xl font-semibold text-ink">{avatarInitials}</span>
+              )}
+            </div>
+            <div className="min-w-0 pt-0.5 sm:pt-1">
+              <p className="text-[9px] sm:text-[11px] uppercase tracking-[0.18em] text-accent font-semibold">Today</p>
+              <h1 className="font-serif text-xl sm:text-2xl md:text-4xl font-semibold truncate mt-0.5 sm:mt-1">
+                {getGreeting()}, {session?.user?.name?.split(" ")[0] ?? "there"}
+              </h1>
+              <p className="text-sm sm:text-base text-ink-soft mt-1 sm:mt-1.5">{dateStr}</p>
+            </div>
           </div>
-          <div className="mt-5 pt-4 border-t border-rule">
+
+          <div className="mt-5 pt-4 sm:mt-6 sm:pt-5 border-t border-rule">
             <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-ink-soft font-semibold">Current level</p>
             <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1 mt-1">
               <p className="font-serif text-5xl sm:text-6xl md:text-7xl font-bold leading-none tabular-nums">{level}</p>
