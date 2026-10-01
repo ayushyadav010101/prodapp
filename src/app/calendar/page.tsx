@@ -46,7 +46,7 @@ export default function CalendarPage() {
   const { status: sessionStatus } = useSession();
   const { events, calendars, syncState, error, refresh } = useCalendarData();
   const [view, setView] = useState<"Today" | "Week" | "Month">("Today");
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(() => new Date());
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
@@ -56,13 +56,21 @@ export default function CalendarPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [todayKey, setTodayKey] = useState(() => new Date().toDateString());
-  const [calendarResetKey, setCalendarResetKey] = useState(0);
 
   useEffect(() => {
-    const updateToday = () => setTodayKey(new Date().toDateString());
+    const updateToday = () => {
+      const nextToday = new Date();
+      const nextTodayKey = nextToday.toDateString();
+      setTodayKey(nextTodayKey);
+      setSelectedDate((current) =>
+        view === "Today" && (!current || current.toDateString() !== nextTodayKey)
+          ? nextToday
+          : current
+      );
+    };
     const timer = window.setInterval(updateToday, 60_000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [view]);
 
   const rangedEvents = useMemo(() => {
     let list: { event: GoogleEvent; date: Date }[];
@@ -111,16 +119,39 @@ export default function CalendarPage() {
     // Some Google accounts have the same holiday calendar subscribed more
     // than once — dedupe by title + exact start time.
     const seen = new Set<string>();
-    return list.filter(({ event, date }) => {
+    const unique = list.filter(({ event, date }) => {
       const key = `${event.summary ?? ""}|${date.toISOString()}`;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
     });
+
+    const isExpired = (event: GoogleEvent, date: Date) => {
+      const dateTime = event.start?.dateTime;
+      if (dateTime) return new Date(dateTime).getTime() < Date.now();
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      return date.getTime() < todayStart.getTime();
+    };
+
+    // Keep the latest two expired events as context at the top, then show
+    // the remaining events in chronological order.
+    const expired = unique
+      .filter(({ event, date }) => isExpired(event, date))
+      .sort((a, b) => b.date.getTime() - a.date.getTime())
+      .slice(0, 2);
+    const expiredKeys = new Set(expired.map(({ event, date }) => `${event.id}|${date.toDateString()}`));
+    const upcoming = unique
+      .filter(({ event, date }) => !expiredKeys.has(`${event.id}|${date.toDateString()}`))
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+    return [...expired.sort((a, b) => a.date.getTime() - b.date.getTime()), ...upcoming];
   }, [events, view, selectedDate, todayKey]);
 
   const rangeLabel = selectedDate
     ? dateHeading(selectedDate)
+    : view === "Today"
+    ? "Today"
     : view === "Week"
     ? "This Week"
     : "This Month";
@@ -248,49 +279,55 @@ export default function CalendarPage() {
         </div>
       </header>
 
-      <div className="grid grid-cols-3 gap-0 rounded-full border border-rule p-0.5 w-full text-[11px] md:text-sm uppercase tracking-widest">
+      <div className="grid grid-cols-3 w-full max-w-xl overflow-hidden rounded-full border border-rule p-0.5 text-[11px] md:text-sm uppercase tracking-widest">
         <button
+          type="button"
           onClick={() => {
+            const today = new Date();
             setView("Today");
-            setSelectedDate(null);
-            setCalendarResetKey((value) => value + 1);
+            setSelectedDate(today);
           }}
-          className={`flex items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 transition-colors ${
-            view === "Today" && !selectedDate
+          className={`relative z-10 flex min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
+            view === "Today"
               ? "bg-accent text-paper font-semibold"
               : "text-ink-soft hover:text-ink"
           }`}
+          aria-pressed={view === "Today"}
         >
-          <IconSun className="w-4 h-4 md:w-5 md:h-5" />
-          Today
+          <IconSun className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+          <span className="truncate">Today</span>
         </button>
         <button
+          type="button"
           onClick={() => {
             setView("Week");
             setSelectedDate(null);
           }}
-          className={`flex items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 transition-colors ${
-            view === "Week" && !selectedDate
+          className={`relative z-10 flex min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
+            view === "Week"
               ? "bg-accent text-paper font-semibold"
               : "text-ink-soft hover:text-ink"
           }`}
+          aria-pressed={view === "Week"}
         >
-          <IconCalendar className="w-4 h-4 md:w-5 md:h-5" />
-          Week
+          <IconCalendar className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+          <span className="truncate">Week</span>
         </button>
         <button
+          type="button"
           onClick={() => {
             setView("Month");
             setSelectedDate(null);
           }}
-          className={`flex items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 transition-colors ${
-            view === "Month" && !selectedDate
+          className={`relative z-10 flex min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
+            view === "Month"
               ? "bg-accent text-paper font-semibold"
               : "text-ink-soft hover:text-ink"
           }`}
+          aria-pressed={view === "Month"}
         >
-          <IconCalendar className="w-4 h-4 md:w-5 md:h-5" />
-          Month
+          <IconCalendar className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+          <span className="truncate">Month</span>
         </button>
       </div>
 
@@ -356,13 +393,16 @@ export default function CalendarPage() {
       <div className="flex flex-col gap-4 md:gap-6">
         <div className="order-1">
           <MonthCalendarGrid
-            key={`${view}-${calendarResetKey}`}
             events={events}
             calendars={calendars}
             selectedDate={selectedDate ?? new Date()}
-            onSelectDate={(d) =>
-              setSelectedDate((cur) => (cur && cur.toDateString() === d.toDateString() ? null : d))
-            }
+            onSelectDate={(d) => {
+              const selected = new Date(d);
+              const today = new Date();
+              const isToday = selected.toDateString() === today.toDateString();
+              setView(isToday ? "Today" : "Month");
+              setSelectedDate(selected);
+            }}
           />
         </div>
 

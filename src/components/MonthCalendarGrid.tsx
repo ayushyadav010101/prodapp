@@ -66,38 +66,38 @@ export function MonthCalendarGrid({
   const isSameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
 
   return (
-    <div className="rounded-[22px] border border-rule bg-paper-raised overflow-hidden w-full">
-      <div className="flex items-center justify-between px-4 py-3 md:px-5 md:py-4 border-b border-rule">
+    <div className="rounded-2xl border border-rule bg-paper-raised overflow-hidden w-full">
+      <div className="flex items-center justify-between px-3 py-2 border-b border-rule">
         <button
           onClick={() => setCursor(new Date(year, month - 1, 1))}
-          className="w-9 h-9 rounded-full border border-rule flex items-center justify-center text-ink-soft hover:border-accent hover:text-accent transition-colors shrink-0"
+          className="w-6 h-6 rounded-full border border-rule flex items-center justify-center text-ink-soft hover:border-accent hover:text-accent transition-colors shrink-0"
           aria-label="Previous month"
         >
-          <IconChevronLeft className="w-4 h-4" />
+          <IconChevronLeft className="w-3 h-3" />
         </button>
-        <p className="font-serif text-base md:text-xl font-semibold tracking-wide truncate px-1">
+        <p className="font-serif text-xs font-semibold tracking-wide truncate px-1">
           {cursor.toLocaleDateString(undefined, { month: "long", year: "numeric" })}
         </p>
         <button
           onClick={() => setCursor(new Date(year, month + 1, 1))}
-          className="w-9 h-9 rounded-full border border-rule flex items-center justify-center text-ink-soft hover:border-accent hover:text-accent transition-colors shrink-0"
+          className="w-6 h-6 rounded-full border border-rule flex items-center justify-center text-ink-soft hover:border-accent hover:text-accent transition-colors shrink-0"
           aria-label="Next month"
         >
-          <IconChevronRight className="w-4 h-4" />
+          <IconChevronRight className="w-3 h-3" />
         </button>
       </div>
 
-      <div className="grid grid-cols-7 text-center px-2 pt-3 md:pt-4">
+      <div className="grid grid-cols-7 text-center px-1 pt-1.5">
         {WEEKDAYS.map((d, i) => (
-          <div key={i} className="text-[10px] md:text-xs uppercase tracking-widest text-ink-soft py-1">
+          <div key={i} className="text-[8px] uppercase tracking-widest text-ink-soft py-0.5">
             {d}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-x-1 gap-y-1 px-2 pb-4 md:pb-5">
+      <div className="grid grid-cols-7 gap-0.5 px-1 pb-1.5">
         {cells.map((date, i) => {
-          if (!date) return <div key={i} className="h-11 md:h-12" />;
+          if (!date) return <div key={i} className="h-7" />;
           const colors = dayColors.get(date.toDateString()) ?? [];
           const isToday = isSameDay(date, today);
           const isSelected = isSameDay(date, selectedDate);
@@ -105,7 +105,7 @@ export function MonthCalendarGrid({
             <button
               key={i}
               onClick={() => onSelectDate(date)}
-              className={`h-11 md:h-12 rounded-xl flex flex-col items-center justify-center text-sm md:text-base relative transition-colors ${
+              className={`h-7 rounded-md flex flex-col items-center justify-center text-[10px] relative transition-colors ${
                 isSelected
                   ? "bg-accent text-paper font-semibold"
                   : isToday
@@ -115,11 +115,11 @@ export function MonthCalendarGrid({
             >
               <span>{date.getDate()}</span>
               {colors.length > 0 && (
-                <span className="flex items-center gap-0.5 mt-1">
+                <span className="flex items-center gap-0.5 mt-0.5">
                   {colors.map((c, ci) => (
                     <span
                       key={ci}
-                      className="w-1.5 h-1.5 rounded-full"
+                      className="w-1 h-1 rounded-full"
                       style={{ backgroundColor: isSelected ? "currentColor" : c }}
                     />
                   ))}
