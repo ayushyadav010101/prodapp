@@ -2761,3 +2761,8 @@ body {
 .zen-challenge-progress-block {
   transform: translateY(8px);
 }
+
+/* Align both progress texts with the requested lower visual position. */
+.zen-challenge-progress-meta {
+  transform: translateY(8px) !important;
+}
