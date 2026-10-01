@@ -13,6 +13,7 @@ import {
   useCalendarData,
   useTasksData,
   useSkillsData,
+  useLevelFromData,
 } from "@/lib/use-google-data";
 
 const HOME_QUOTE =
@@ -58,6 +59,7 @@ export default function HomePage() {
     (t) => t.status === "completed" && t.completed && new Date(t.completed).toDateString() === todayKey
   ).length;
   const completedChallengesToday = skills.filter((s) => s.completedDates.includes(todayIso)).length;
+  const { level } = useLevelFromData(events, tasks, skills);
   if (status === "unauthenticated") {
     return (
       <div className="max-w-md mx-auto px-6 py-16 text-center">
@@ -75,8 +77,21 @@ export default function HomePage() {
 
   return (
     <div className="max-w-6xl mx-auto px-3 sm:px-5 md:px-6 py-3 sm:py-5 md:py-5 pb-20 md:pb-5">
-      <div className={`transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3 md:gap-4">
+      <div className={`grid gap-3 md:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(290px,0.8fr)] transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
+        <section aria-label="Your progress" className="rounded-2xl sm:rounded-[1.9rem] border border-rule bg-paper-raised p-4 sm:p-5 md:p-6 md:min-h-[300px] flex flex-col justify-between">
+          <div>
+            <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-accent font-semibold">Your progress</p>
+            <h1 className="font-serif text-xl sm:text-2xl md:text-3xl font-semibold mt-1">Keep showing up.</h1>
+          </div>
+          <div className="mt-5 pt-4 border-t border-rule">
+            <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-ink-soft font-semibold">Current level</p>
+            <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1 mt-1">
+              <p className="font-serif text-5xl sm:text-6xl md:text-7xl font-bold leading-none tabular-nums">{level}</p>
+              <span className="text-sm md:text-base text-ink-soft">{level} active day{level === 1 ? "" : "s"}</span>
+            </div>
+          </div>
+        </section>
+        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-1 gap-3 sm:gap-3 md:gap-4">
           <HomeCountCard
             href="/calendar"
             icon={<IconCalendar className="w-6 h-6 sm:w-7 sm:h-7" />}
@@ -152,7 +167,7 @@ function HomeCountCard({
   return (
     <Link
       href={href}
-      className="group rounded-xl sm:rounded-[1.65rem] border border-rule bg-paper-raised p-4 sm:p-4 md:p-5 flex items-center justify-between gap-2 sm:gap-3 min-h-[72px] sm:min-h-[96px] md:h-[calc((430px-32px)/3)] hover:border-ink transition-colors"
+      className="group rounded-xl sm:rounded-[1.65rem] border border-rule bg-paper-raised p-4 sm:p-4 md:p-5 flex items-center justify-between gap-2 sm:gap-3 min-h-[72px] sm:min-h-[96px] md:min-h-[88px] hover:border-ink transition-colors"
     >
       <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
         <div className="text-accent shrink-0">{icon}</div>
