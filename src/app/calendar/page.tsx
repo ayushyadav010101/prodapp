@@ -515,10 +515,10 @@ export default function CalendarPage() {
                             type="button"
                             onClick={() => startEventEdit(event.id, event.summary || "")}
                             disabled={deletingId === event.id || editingEventSavingId === event.id}
-                            className="shrink-0 text-ink-soft/55 hover:text-accent transition-colors"
+                            className="edit-title-button"
                             aria-label="Edit event title"
                           >
-                            <IconPencil className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                            <IconPencil className="w-[18px] h-[18px]" />
                           </button>
                         </div>
                       )}

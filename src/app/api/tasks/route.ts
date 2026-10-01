@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { listTaskLists, listTasks, insertTask, GoogleApiError } from "@/lib/google-api";
 import { SKILLS_LIST_TITLE } from "@/lib/skills-sync";
-import { FOCUS_LIST_TITLE } from "@/lib/focus-sync";
 import { LEVEL_LOG_LIST_TITLE } from "@/lib/level-sync";
 
 export async function GET() {
@@ -24,7 +23,7 @@ export async function GET() {
     // The Skill Challenges list is internal to the Skills feature — don't
     // surface it as a regular task category here.
     const taskLists = allLists.filter(
-      (l) => l.title !== SKILLS_LIST_TITLE && l.title !== FOCUS_LIST_TITLE && l.title !== LEVEL_LOG_LIST_TITLE
+      (l) => l.title !== SKILLS_LIST_TITLE && l.title !== LEVEL_LOG_LIST_TITLE
     );
 
     const tasksByList = await Promise.all(

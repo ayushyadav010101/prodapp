@@ -15,7 +15,6 @@ import {
   useCalendarData,
   useTasksData,
   useSkillsData,
-  useFocusSessionHistory,
   useLevelFromData,
 } from "@/lib/use-google-data";
 
@@ -32,7 +31,6 @@ export default function HomePage() {
   const { events, error: calError, refresh: refreshEvents } = useCalendarData();
   const { tasks, error: taskError, refresh: refreshTasks } = useTasksData();
   const { skills } = useSkillsData();
-  const { sessions: focusSessions } = useFocusSessionHistory();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -73,11 +71,9 @@ export default function HomePage() {
     (t) => t.status === "completed" && t.completed && new Date(t.completed).toDateString() === todayKey
   ).length;
   const completedChallengesToday = skills.filter((s) => s.completedDates.includes(todayIso)).length;
-  const focusSessionsToday = focusSessions.filter((f) => new Date(f.completedAt).toDateString() === todayKey).length;
-
   // Uses the already-fetched data above (no duplicate network calls), merged
   // with the permanent Level Log so the level can never drop.
-  const { level } = useLevelFromData(events, tasks, skills, focusSessions);
+  const { level } = useLevelFromData(events, tasks, skills);
 
   if (status === "unauthenticated") {
     return (
@@ -181,7 +177,6 @@ export default function HomePage() {
         <div className="hidden sm:flex px-4 sm:px-5 md:px-6 pb-3.5 sm:pb-4 text-[10px] sm:text-xs text-ink-soft flex-wrap gap-x-4 gap-y-1.5">
           <span>{completedTasksToday} task{completedTasksToday === 1 ? "" : "s"} completed today</span>
           <span>{completedChallengesToday} challenge check-in{completedChallengesToday === 1 ? "" : "s"}</span>
-          <span>{focusSessionsToday} focus session{focusSessionsToday === 1 ? "" : "s"}</span>
         </div>
       </section>
     </div>

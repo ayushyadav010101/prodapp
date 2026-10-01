@@ -439,10 +439,10 @@ export default function TasksPage() {
                                   type="button"
                                   onClick={() => startTaskEdit(task.id, task.title || "")}
                                   disabled={pending}
-                                  className="text-ink-soft/60 hover:text-accent transition-colors shrink-0 mt-0.5"
+                                  className="edit-title-button"
                                   aria-label="Edit task title"
                                 >
-                                  <IconPencil className="w-3.5 h-3.5 md:w-5 md:h-5" />
+                                  <IconPencil className="w-[18px] h-[18px]" />
                                 </button>
                               </div>
                             )}

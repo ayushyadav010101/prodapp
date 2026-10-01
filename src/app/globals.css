@@ -45,1088 +45,18 @@ body {
   color: var(--ink);
 }
 
-
-/* Focus Session visual system: highlighted editorial cards + subtle motion from the user's reference image. */
-.focus-art {
-  animation: focus-breathe 4.8s ease-in-out infinite;
-  filter: grayscale(1) contrast(1.02);
-  will-change: transform, filter;
-}
-
-.focus-art-frame {
-  animation: focus-glow 5.5s ease-in-out infinite;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 16px 40px rgba(0,0,0,0.22);
-}
-
-.focus-active-shell:fullscreen {
-  background: var(--paper);
-}
-
-.focus-fullscreen {
-  min-height: 100vh;
-}
-
-@keyframes focus-breathe {
-  0%, 100% { transform: scale(1); filter: grayscale(1) contrast(1.02) brightness(0.98); }
-  50% { transform: scale(1.025); filter: grayscale(1) contrast(1.05) brightness(1.04); }
-}
-
-@keyframes focus-glow {
-  0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 16px 40px rgba(0,0,0,0.22); }
-  50% { box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 18px 48px rgba(0,0,0,0.30); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .focus-art, .focus-art-frame { animation: none; }
-}
-
-@media (max-width: 767px) {
-  .focus-art { animation-duration: 6s; }
-}
-
-/* Focus Session v3: compact viewport-first layout and true dark fullscreen mode. */
-.focus-active-shell {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.focus-active-shell:fullscreen {
-  width: 100vw;
-  height: 100vh;
-  overflow: auto;
-  background: #0f0e0c;
-  color: #f3efe6;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-inner {
-  min-height: 100vh;
-  border-color: rgba(255,255,255,.13);
-  border-radius: 0;
-  background: #0f0e0c;
-  color: #f3efe6;
-}
-
-.focus-fullscreen-header {
-  border-color: rgba(255,255,255,.14);
-  background: #151310;
-}
-
-.focus-fullscreen-header p,
-.focus-fullscreen-header button,
-.focus-fullscreen-header .text-ink-soft {
-  color: rgba(243,239,230,.72);
-}
-
-.focus-fullscreen-button {
-  border-color: rgba(255,255,255,.20);
-  color: #f3efe6;
-}
-
-.focus-fullscreen-button:hover {
-  border-color: #e08a5f;
-}
-
-.focus-setup-shell {
-  overflow: hidden;
-}
-
-@media (min-width: 1024px) {
-  .focus-setup-shell {
-    max-height: calc(100vh - 210px);
-  }
-
-  .focus-setup-shell > .grid {
-    min-height: 0;
-  }
-
-  .focus-setup-shell section {
-    min-height: 0;
-    overflow: hidden;
-  }
-
-  .focus-setup-shell .history-list-scroll {
-    scrollbar-width: thin;
-  }
-}
-
-@media (max-width: 1023px) and (min-width: 768px) {
-  .focus-setup-shell > .grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-@media (max-width: 1023px) {
-  .focus-active-shell .focus-profile-panel {
-    order: 2;
-  }
-
-  .focus-active-shell .focus-timer-panel {
-    order: 1;
-  }
-}
-
-@media (max-width: 767px) {
-  .focus-active-shell:fullscreen .focus-fullscreen-inner {
-    padding: .75rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-timer-panel {
-    min-height: calc(100vh - 96px);
-    border-radius: 1.75rem;
-  }
-
-  .focus-active-shell .focus-timer-panel {
-    padding: 1rem;
-  }
-}
-
-/* Focus Session v4: content-sized by default, viewport-aware only where it improves usability. */
-.focus-setup-shell {
-  overflow: visible;
-}
-
-.focus-setup-shell > .grid {
-  align-items: stretch;
-}
-
-.focus-setup-shell section {
-  min-height: 0;
-}
-
-.focus-setup-shell .history-list-scroll {
-  min-height: 96px;
-  max-height: min(360px, calc(100dvh - 330px));
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--rule) transparent;
-}
-
-.focus-setup-shell .history-list-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-
-.focus-setup-shell .history-list-scroll::-webkit-scrollbar-thumb {
-  background: var(--rule);
-  border-radius: 999px;
-}
-
-@media (min-width: 1024px) {
-  .focus-setup-shell {
-    max-height: none;
-  }
-
-  .focus-setup-shell > .grid {
-    height: auto;
-  }
-
-  .focus-setup-shell section:first-child {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .focus-setup-shell section:first-child > button {
-    margin-top: auto;
-  }
-
-  .focus-setup-shell .history-list-scroll {
-    max-height: min(340px, calc(100dvh - 320px));
-  }
-
-  .focus-active-shell > div {
-    overflow: visible;
-  }
-}
-
-@media (max-width: 1023px) {
-  .focus-setup-shell .history-list-scroll {
-    max-height: min(300px, 42dvh);
-  }
-}
-
-@media (max-width: 767px) {
-  .focus-setup-shell {
-    padding: .5rem;
-  }
-
-  .focus-setup-shell > .grid {
-    gap: .5rem;
-  }
-
-  .focus-setup-shell section {
-    padding: .8rem;
-  }
-
-  .focus-setup-shell h2 {
-    font-size: 1.45rem;
-  }
-
-  .focus-setup-shell .history-list-scroll {
-    max-height: 272px;
-  }
-
-  .focus-active-shell .focus-timer-panel {
-    min-height: auto;
-  }
-}
-
-/* Focus Session v5: edge-to-edge fullscreen layout — no header, compact two-column stage. */
-@media (min-width: 768px) {
-  .focus-active-shell:fullscreen .focus-fullscreen-inner {
-    padding: 0;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-panel {
-    width: 100%;
-    max-width: none;
-    min-height: 100vh;
-    border: 0;
-    border-radius: 0;
-    padding: clamp(1.25rem, 3vw, 2.5rem);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-content {
-    width: min(1180px, 100%);
-    min-height: min(86vh, 760px);
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 460px);
-    grid-template-rows: auto auto auto auto auto 1fr auto;
-    column-gap: clamp(2rem, 6vw, 6rem);
-    align-items: center;
-    text-align: left;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-content > p:first-child {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    justify-self: center;
-    margin: 0 0 .25rem;
-    text-align: center;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-art {
-    grid-column: 2;
-    grid-row: 2 / 8;
-    align-self: center;
-    justify-self: center;
-    width: min(100%, 440px);
-    margin: 0;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-art .focus-art-frame {
-    max-width: none;
-    width: 100%;
-    margin: 0;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-art > p {
-    text-align: center;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-content > p:nth-of-type(2) {
-    grid-column: 1;
-    grid-row: 2;
-    justify-self: start;
-    margin-top: 0;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-content > p:nth-of-type(3) {
-    grid-column: 1;
-    grid-row: 3;
-    justify-self: start;
-    margin-top: 0;
-    font-size: clamp(2.75rem, 6vw, 5rem);
-    line-height: .95;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-content > .mx-auto.mt-2\.5 {
-    grid-column: 1;
-    grid-row: 4;
-    width: 100%;
-    max-width: 620px;
-    margin: .35rem 0 0;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-action-row {
-    grid-column: 1;
-    grid-row: 5;
-    justify-content: flex-start;
-    align-items: stretch;
-    width: 100%;
-    max-width: 620px;
-    margin: .65rem 0 0;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: .65rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-action-row button {
-    width: 100%;
-    min-height: 46px;
-    border-radius: .9rem;
-    justify-content: center;
-    white-space: nowrap;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-content > p.font-serif {
-    grid-column: 1;
-    grid-row: 6;
-    justify-self: start;
-    max-width: 620px;
-    margin: .65rem 0 0;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-content > button:last-child {
-    grid-column: 1;
-    grid-row: 7;
-    justify-self: start;
-    margin-top: .5rem;
-  }
-}
-
-@media (max-width: 767px) {
-  .focus-active-shell:fullscreen .focus-fullscreen-inner {
-    padding: .5rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-panel {
-    min-height: calc(100vh - 1rem);
-    border: 0;
-    border-radius: 1.25rem;
-    padding: 1rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-content {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    text-align: center;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-art {
-    order: 2;
-    width: min(72vw, 360px);
-    margin: .65rem auto 0;
-    align-self: center;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-content > p:nth-of-type(2) { order: 3; }
-  .focus-active-shell:fullscreen .focus-fullscreen-content > p:nth-of-type(3) { order: 4; }
-  .focus-active-shell:fullscreen .focus-fullscreen-content > .mx-auto.mt-2\.5 { order: 5; }
-  .focus-active-shell:fullscreen .focus-fullscreen-action-row {
-    order: 6;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    width: 100%;
-    margin-top: .65rem;
-  }
-  .focus-active-shell:fullscreen .focus-fullscreen-content > p.font-serif { order: 7; }
-  .focus-active-shell:fullscreen .focus-fullscreen-content > button:last-child { order: 8; }
-}
-
-/* Focus Session v6: reference-matched fullscreen dashboard. Explicit layout classes avoid nth-child overlap. */
-.focus-session-frame {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.focus-active-shell:fullscreen {
-  width: 100vw;
-  height: 100dvh;
-  overflow: hidden;
-  background: #0f0e0c;
-  color: #f3efe6;
-}
-
-.focus-active-shell:fullscreen .focus-session-frame {
-  width: 100vw;
-  height: 100dvh;
-  overflow: hidden;
-  background: #0f0e0c;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-stage {
-  width: 100%;
-  height: 100%;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-panel {
-  width: 100%;
-  height: 100%;
-  padding: clamp(1.5rem, 3vw, 3rem) clamp(2rem, 4.2vw, 5rem);
-  background:
-    radial-gradient(circle at 75% 45%, rgba(242, 143, 54, 0.035), transparent 25%),
-    #0f0e0c;
-}
-
-.focus-fullscreen-topbar {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  min-height: 3.5rem;
-}
-
-.focus-profile-mini {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-  min-width: 0;
-}
-
-.focus-profile-avatar {
-  display: grid;
-  place-items: center;
-  width: 3.1rem;
-  height: 3.1rem;
-  flex: 0 0 auto;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,.20);
-  border-radius: 999px;
-  background: #e8dfca;
-  color: #201d18;
-}
-
-.focus-profile-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.focus-profile-name {
-  color: #f3efe6;
-  font-size: .95rem;
-  font-weight: 700;
-  letter-spacing: .02em;
-}
-
-.focus-profile-level {
-  margin-top: .15rem;
-  color: rgba(243,239,230,.50);
-  font-size: .72rem;
-  letter-spacing: .04em;
-}
-
-.focus-fullscreen-date {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  color: rgba(243,239,230,.78);
-  font-size: .68rem;
-  font-weight: 700;
-  letter-spacing: .22em;
-  white-space: nowrap;
-}
-
-.focus-fullscreen-icon-button {
-  display: grid;
-  place-items: center;
-  width: 2.9rem;
-  height: 2.9rem;
-  border: 1px solid rgba(255,255,255,.20);
-  border-radius: .85rem;
-  color: #f3efe6;
-  transition: border-color .2s ease, background .2s ease;
-}
-
-.focus-fullscreen-icon-button:hover {
-  border-color: #f39a3d;
-  background: rgba(243,154,61,.08);
-}
-
-.focus-fullscreen-grid {
-  width: min(1400px, 100%);
-  height: calc(100% - 3.5rem);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: minmax(0, .92fr) minmax(420px, 1.08fr);
-  gap: clamp(2rem, 7vw, 7rem);
-  align-items: center;
-}
-
-.focus-fullscreen-copy {
-  min-width: 0;
-  padding-left: clamp(0rem, 1vw, 1rem);
-}
-
-.focus-mode-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: .8rem;
-  color: #f39a3d;
-  font-size: .72rem;
-  font-weight: 800;
-  letter-spacing: .34em;
-}
-
-.focus-mode-eyebrow span {
-  display: inline-block;
-  width: 2rem;
-  height: 1px;
-  background: currentColor;
-}
-
-.focus-fullscreen-copy h1 {
-  max-width: 700px;
-  margin-top: .7rem;
-  color: #f5f1e9;
-  font-family: var(--font-inter), sans-serif;
-  font-size: clamp(3.5rem, 6.5vw, 7rem);
-  font-weight: 800;
-  line-height: .94;
-  letter-spacing: -.055em;
-  overflow-wrap: anywhere;
-}
-
-.focus-mode-subtitle {
-  margin-top: 1.15rem;
-  color: rgba(243,239,230,.54);
-  font-size: clamp(1rem, 1.5vw, 1.35rem);
-  letter-spacing: .01em;
-}
-
-.focus-fullscreen-action-row {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: .7rem;
-  width: min(100%, 700px);
-  margin-top: 3rem;
-}
-
-.focus-control-button {
-  min-height: 3.6rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: .55rem;
-  padding: .75rem 1rem;
-  border-radius: .95rem;
-  font-size: .75rem;
-  font-weight: 800;
-  letter-spacing: .12em;
-  white-space: nowrap;
-  transition: transform .2s ease, border-color .2s ease, background .2s ease;
-}
-
-.focus-control-button:hover {
-  transform: translateY(-1px);
-}
-
-.focus-control-button-primary {
-  border: 1px solid #f39a3d;
-  background: #f39a3d;
-  color: #17120d;
-}
-
-.focus-control-button-primary:hover {
-  background: #ffab52;
-  border-color: #ffab52;
-}
-
-.focus-control-button-secondary {
-  border: 1px solid rgba(255,255,255,.19);
-  background: rgba(255,255,255,.015);
-  color: #f3efe6;
-}
-
-.focus-control-button-secondary:hover {
-  border-color: rgba(243,154,61,.72);
-  background: rgba(243,154,61,.06);
-}
-
-.focus-quote {
-  max-width: 680px;
-  margin-top: 3.5rem;
-  color: rgba(243,239,230,.62);
-  font-family: var(--font-source-serif), serif;
-  font-size: 1rem;
-  font-style: italic;
-  line-height: 1.55;
-}
-
-.focus-end-button {
-  margin-top: 1.6rem;
-  color: #ff8c78;
-  font-size: .68rem;
-  font-weight: 800;
-  letter-spacing: .14em;
-}
-
-.focus-end-button:hover {
-  text-decoration: underline;
-  text-underline-offset: .25rem;
-}
-
-.focus-fullscreen-visual {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.focus-fullscreen-art {
-  width: min(100%, 560px);
-  max-height: 55vh;
-}
-
-.focus-fullscreen-art > .focus-study-illustration {
-  width: 100%;
-  max-width: 560px;
-}
-
-.focus-visual-label {
-  margin-top: .75rem;
-  color: rgba(243,239,230,.60);
-  font-size: .66rem;
-  font-weight: 700;
-  letter-spacing: .43em;
-}
-
-.focus-countdown {
-  margin-top: .45rem;
-  color: #f39a3d;
-  font-size: clamp(3.4rem, 6vw, 5.5rem);
-  font-weight: 300;
-  line-height: .92;
-  letter-spacing: -.045em;
-  font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 30px rgba(243,154,61,.08);
-}
-
-.focus-progress-wrap {
-  width: min(100%, 660px);
-  margin-top: 1.05rem;
-}
-
-.focus-progress-track {
-  width: 100%;
-  height: .7rem;
-  overflow: hidden;
-  border-radius: 999px;
-  background: rgba(255,255,255,.11);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
-}
-
-.focus-progress-fill {
-  height: 100%;
-  border-radius: inherit;
-  background: #f39a3d;
-  box-shadow: 0 0 18px rgba(243,154,61,.20);
-  transition: width 1s linear;
-}
-
-.focus-progress-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: .45rem;
-  color: rgba(243,239,230,.45);
-  font-size: .62rem;
-  letter-spacing: .08em;
-  font-variant-numeric: tabular-nums;
-}
-
 /* Keep the desktop profile/date controls pinned to the upper edge so they never collide with the main dashboard content. */
-@media (min-width: 768px) {
-  .focus-fullscreen-topbar {
-    position: fixed;
-    top: clamp(1rem, 2vw, 2rem);
-    left: clamp(1.25rem, 3vw, 3rem);
-    right: clamp(1.25rem, 3vw, 3rem);
-    min-height: 3.5rem;
-    pointer-events: none;
-  }
-
-  .focus-fullscreen-topbar > * {
-    pointer-events: auto;
-  }
-
-  .focus-fullscreen-grid {
-    padding-top: clamp(4.75rem, 7vh, 6.5rem);
-    box-sizing: border-box;
-  }
-}
-
-@media (max-width: 1100px) and (min-width: 768px) {
-  .focus-active-shell:fullscreen .focus-fullscreen-panel {
-    padding-inline: 2rem;
-  }
-
-  .focus-fullscreen-grid {
-    grid-template-columns: minmax(0, .95fr) minmax(350px, 1.05fr);
-    gap: 2.5rem;
-  }
-
-  .focus-fullscreen-copy h1 {
-    font-size: clamp(3rem, 6vw, 5.2rem);
-  }
-
-  .focus-fullscreen-action-row {
-    margin-top: 2rem;
-  }
-
-  .focus-quote {
-    margin-top: 2rem;
-  }
-}
 
 @media (max-width: 767px) {
   /* Mobile-only fullscreen layout: closely follows the phone reference.
      Desktop/tablet fullscreen remains untouched above this breakpoint. */
-  .focus-active-shell:fullscreen {
-    width: 100vw;
-    min-height: 100dvh;
-    overflow-x: hidden;
-    overflow-y: auto;
-    background: #0f0e0c;
-  }
-
-  .focus-active-shell:fullscreen .focus-session-frame {
-    width: 100vw;
-    min-height: 100dvh;
-    height: auto;
-    overflow: visible;
-    background: #0f0e0c;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-stage {
-    width: 100%;
-    min-height: 100dvh;
-    height: auto;
-    overflow: visible;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-panel {
-    width: 100%;
-    min-height: 100dvh;
-    height: auto;
-    box-sizing: border-box;
-    padding: 1.1rem clamp(2.25rem, 10vw, 5.5rem) 2rem;
-    overflow-x: hidden;
-    background: #0f0e0c;
-  }
-
-  .focus-fullscreen-topbar {
-    min-height: 3.2rem;
-    gap: .65rem;
-    align-items: center;
-  }
-
-  .focus-profile-mini {
-    gap: .7rem;
-  }
-
-  .focus-profile-avatar {
-    width: 2.8rem;
-    height: 2.8rem;
-  }
-
-  .focus-profile-name {
-    font-size: .98rem;
-    line-height: 1.05;
-  }
-
-  .focus-profile-level {
-    margin-top: .18rem;
-    font-size: .7rem;
-  }
-
-  .focus-fullscreen-icon-button {
-    width: 2.8rem;
-    height: 2.8rem;
-    flex: 0 0 auto;
-    border-radius: .85rem;
-  }
-
-  .focus-fullscreen-grid {
-    width: 100%;
-    max-width: none;
-    height: auto;
-    margin-top: 4.55rem;
-    padding: 0 0 .25rem;
-    box-sizing: border-box;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(9.5rem, .92fr);
-    grid-template-areas:
-      "eyebrow art"
-      "title art"
-      "subtitle art"
-      "date date"
-      "actions actions"
-      "quote quote"
-      "end end"
-      "timerlabel timerlabel"
-      "timer timer"
-      "progress progress";
-    align-items: start;
-    column-gap: .9rem;
-    row-gap: 0;
-  }
-
-  .focus-fullscreen-copy,
-  .focus-fullscreen-visual {
-    display: contents;
-  }
-
-  .focus-mode-eyebrow {
-    grid-area: eyebrow;
-    align-self: center;
-    gap: .7rem;
-    margin: 0;
-    font-size: .78rem;
-    letter-spacing: .27em;
-    line-height: 1;
-  }
-
-  .focus-mode-eyebrow span {
-    width: 2.25rem;
-  }
-
-  .focus-fullscreen-copy h1 {
-    grid-area: title;
-    min-width: 0;
-    max-width: 100%;
-    margin: .62rem 0 0;
-    font-size: clamp(3.8rem, 15vw, 7rem);
-    line-height: .82;
-    letter-spacing: -.07em;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-  }
-
-  .focus-mode-subtitle {
-    grid-area: subtitle;
-    min-width: 0;
-    max-width: 100%;
-    margin: .85rem 0 0;
-    color: rgba(243,239,230,.61);
-    font-size: clamp(.98rem, 3.9vw, 1.35rem);
-    line-height: 1.26;
-  }
-
-  .focus-live-datetime {
-    grid-area: date;
-    margin: 2rem 0 0;
-    color: #f39a3d;
-    font-size: clamp(1rem, 4.35vw, 1.55rem);
-    font-weight: 800;
-    letter-spacing: .09em;
-    line-height: 1;
-    text-transform: uppercase;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: clip;
-  }
-
-  .focus-fullscreen-art {
-    grid-area: art;
-    justify-self: end;
-    align-self: start;
-    width: min(100%, 20rem);
-    max-width: 20rem;
-    margin-top: 0;
-    padding: 0;
-    border-radius: 1.45rem;
-    background: #15130f;
-    overflow: hidden;
-  }
-
-  .focus-fullscreen-art > .focus-study-illustration {
-    display: block;
-    width: 100%;
-    max-width: none;
-    height: auto;
-  }
-
-  .focus-fullscreen-action-row {
-    grid-area: actions;
-    width: 100%;
-    margin-top: 1.35rem;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: .8rem;
-  }
-
-  .focus-control-button {
-    width: 100%;
-    min-width: 0;
-    min-height: 5rem;
-    padding: .78rem 1rem;
-    border-radius: 1rem;
-    font-size: .88rem;
-    letter-spacing: .1em;
-  }
-
-  .focus-control-button svg {
-    width: 1rem;
-    height: 1rem;
-    flex: 0 0 auto;
-  }
-
-  .focus-quote {
-    grid-area: quote;
-    width: 100%;
-    max-width: 40rem;
-    margin: 2.65rem 0 0;
-    color: rgba(243,239,230,.68);
-    font-size: clamp(.98rem, 3.9vw, 1.25rem);
-    line-height: 1.42;
-  }
-
-  .focus-end-button {
-    grid-area: end;
-    justify-self: start;
-    margin: 1.6rem 0 0;
-    color: #ff7866;
-    font-size: clamp(.75rem, 3.1vw, .98rem);
-    letter-spacing: .09em;
-    line-height: 1.1;
-    text-align: left;
-  }
-
-  .focus-fullscreen-visual .focus-visual-label {
-    grid-area: timerlabel;
-    justify-self: center;
-    margin: 3.2rem 0 0;
-    padding-top: 1.15rem;
-    border-top: 1px solid rgba(255,255,255,.17);
-    color: rgba(243,239,230,.55);
-    font-size: clamp(.8rem, 3.2vw, 1.25rem);
-    font-weight: 700;
-    letter-spacing: .34em;
-    text-align: center;
-  }
-
-  .focus-fullscreen-visual .focus-countdown {
-    grid-area: timer;
-    justify-self: center;
-    margin: .48rem 0 0;
-    color: #f39a3d;
-    font-size: clamp(5rem, 17vw, 8rem);
-    font-weight: 300;
-    line-height: .82;
-    letter-spacing: -.055em;
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-    text-align: center;
-  }
-
-  .focus-fullscreen-visual .focus-progress-wrap {
-    grid-area: progress;
-    width: 100%;
-    min-width: 0;
-    margin: .9rem 0 0;
-      }
-
-  .focus-progress-track {
-    width: 100%;
-    height: 1.55rem;
-    border-radius: 999px;
-    background: rgba(255,255,255,.13);
-  }
-
-  .focus-progress-meta {
-    display: flex;
-    justify-content: space-between;
-    gap: .5rem;
-    width: 100%;
-    margin-top: .55rem;
-    color: rgba(243,239,230,.56);
-    font-size: clamp(.72rem, 3vw, 1.05rem);
-    letter-spacing: 0;
-  }
 }
 
 /* Short mobile screens keep the stronger sizing above from pushing the last
    controls below the fold. */
-@media (max-width: 767px) and (max-height: 760px) {
-  .focus-active-shell:fullscreen .focus-fullscreen-panel {
-    padding: .75rem .8rem 1rem;
-  }
 
-  .focus-fullscreen-topbar {
-    min-height: 2.6rem;
-  }
 
-  .focus-profile-avatar,
-  .focus-fullscreen-icon-button {
-    width: 2.2rem;
-    height: 2.2rem;
-  }
-
-  .focus-fullscreen-grid {
-    gap: .7rem;
-    padding-top: .3rem;
-    padding-bottom: .25rem;
-  }
-
-  .focus-fullscreen-art {
-    width: min(76vw, 305px);
-  }
-
-  .focus-fullscreen-visual .focus-progress-wrap {
-    margin-top: .58rem;
-  }
-
-  .focus-fullscreen-visual .focus-visual-label {
-    margin-top: .35rem;
-    font-size: .55rem;
-  }
-
-  .focus-fullscreen-visual .focus-countdown {
-    margin-top: 0;
-    font-size: clamp(1.7rem, 7.5vw, 2.5rem);
-  }
-
-  .focus-fullscreen-copy h1 {
-    font-size: clamp(1.7rem, 9vw, 2.6rem);
-  }
-
-  .focus-mode-subtitle {
-    font-size: .8rem;
-  }
-
-  .focus-fullscreen-action-row {
-    margin-top: .72rem;
-  }
-
-  .focus-control-button {
-    min-height: 2.65rem;
-    font-size: .55rem;
-  }
-
-  .focus-quote {
-    margin-top: .6rem;
-    font-size: .7rem;
-  }
-
-  .focus-end-button {
-    margin-top: .48rem;
-    font-size: .52rem;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .focus-control-button,
-  .focus-progress-fill {
-    transition: none;
-  }
-}
-
-/* Active session (embedded ZenSpace page): remove the old left rail and make the
-   session itself fit the available viewport on laptop + phone. */
-.focus-skills-shell {
+.zen-space-shell {
   height: 100dvh;
   max-height: 100dvh;
   overflow-y: auto;
@@ -1135,224 +65,19 @@ body {
   flex-direction: column;
 }
 
-.focus-skills-shell > header,
-.focus-skills-shell > .flex.gap-5 {
+.zen-space-shell > header,
+.zen-space-shell > .flex.gap-5 {
   flex: 0 0 auto;
-}
-
-.focus-skills-shell > .focus-active-shell {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.focus-session-stage {
-  min-width: 0;
-  height: 100%;
-  flex: 1 1 auto;
-  min-height: 0;
-  border-radius: 1.5rem;
-  padding: clamp(.55rem, 1.1vw, .9rem);
-  background: #0f0e0c;
-  color: #f3efe6;
-  overflow: auto;
-}
-
-.focus-session-mobile-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  min-height: 2.4rem;
-  margin-bottom: .5rem;
-}
-
-.focus-session-mobile-header .focus-profile-mini {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-}
-
-.focus-session-mobile-header .focus-profile-avatar {
-  width: 2.75rem;
-  height: 2.75rem;
-  flex: 0 0 auto;
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 999px;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-  background: #1a1815;
-  color: rgba(243,239,230,.76);
-}
-
-.focus-session-mobile-header .focus-profile-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.focus-session-dashboard {
-  min-height: 0;
-  height: 100%;
-  display: grid;
-  grid-template-columns: minmax(220px, .78fr) minmax(280px, 1.22fr);
-  align-items: center;
-  align-content: center;
-  justify-content: center;
-  gap: clamp(.7rem, 1.6vw, 1.4rem);
-  padding: 0;
-}
-
-.focus-session-dashboard-copy {
-  min-width: 0;
-  max-width: 380px;
-}
-
-.focus-session-dashboard-copy h1 {
-  margin: .2rem 0 0;
-  font-family: var(--font-source-serif);
-  font-size: clamp(1.4rem, 2.4vw, 2.2rem);
-  line-height: .98;
-  letter-spacing: -.03em;
-  overflow-wrap: anywhere;
-}
-
-.focus-session-dashboard-copy .focus-mode-subtitle {
-  margin-top: .35rem;
-  font-size: clamp(.78rem, .9vw, .88rem);
-  color: var(--ink-soft);
-}
-
-.focus-session-dashboard-actions {
-  margin-top: .65rem;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: .4rem;
-  max-width: 420px;
-}
-
-.focus-session-dashboard-visual {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.focus-session-dashboard-date {
-  margin-bottom: .3rem;
-  font-size: .54rem;
-  font-weight: 700;
-  letter-spacing: .2em;
-  color: rgba(243,239,230,.68);
-  text-align: center;
-}
-
-.focus-session-dashboard-art {
-  width: min(58%, 220px);
-  max-width: 220px;
-  border-radius: 1.2rem;
-  padding: .15rem;
-  background: #11100e;
-}
-
-.focus-session-dashboard-art > .focus-study-illustration {
-  width: 100%;
-  max-width: none;
-}
-
-.focus-session-dashboard-visual .focus-visual-label {
-  margin-top: .35rem;
-  font-size: .54rem;
-  font-weight: 600;
-  letter-spacing: .3em;
-  text-transform: uppercase;
-  color: rgba(243,239,230,.58);
-}
-
-.focus-session-dashboard-visual .focus-countdown {
-  margin-top: .12rem;
-  font-size: clamp(1.5rem, 2.6vw, 2.3rem);
-  font-weight: 300;
-  line-height: .96;
-  font-variant-numeric: tabular-nums;
-  color: #f39a3d;
-}
-
-.focus-session-dashboard-visual .focus-progress-wrap {
-  width: min(100%, 320px);
-  margin-top: .35rem;
-}
-
-.focus-session-dashboard-visual .focus-progress-track {
-  height: .4rem;
-  overflow: hidden;
-  border-radius: 999px;
-  background: rgba(255,255,255,.12);
-}
-
-.focus-session-dashboard-visual .focus-progress-fill {
-  height: 100%;
-  border-radius: inherit;
-  background: #f39a3d;
-  transition: width 1s linear;
-}
-
-.focus-session-dashboard-visual .focus-progress-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: .5rem;
-  margin-top: .25rem;
-  font-size: .52rem;
-  color: rgba(243,239,230,.5);
-}
-
-.focus-session-dashboard .focus-quote {
-  margin-top: .55rem;
-  max-width: 380px;
-  color: var(--ink-soft);
-  font-size: .82rem;
-}
-
-.focus-session-dashboard .focus-end-button {
-  margin-top: .35rem;
-}
-
-.focus-session-dashboard-actions .focus-control-button {
-  min-height: 2.3rem;
-  padding: .45rem .5rem;
-  font-size: .62rem;
-  border-radius: .7rem;
-  gap: .35rem;
-}
-
-.focus-session-dashboard-actions .focus-control-button svg {
-  width: .85rem;
-  height: .85rem;
 }
 
 @media (max-width: 1100px) and (min-width: 768px) {
-  .focus-skills-shell {
+  .zen-space-shell {
     padding-inline: 1rem;
-  }
-
-  .focus-session-dashboard {
-    grid-template-columns: minmax(250px, .8fr) minmax(360px, 1fr);
-    gap: 2rem;
-    min-height: calc(100dvh - 205px);
-  }
-
-  .focus-session-dashboard-copy h1 {
-    font-size: clamp(2.8rem, 5.5vw, 4.6rem);
-  }
-
-  .focus-session-dashboard-art {
-    width: min(100%, 390px);
   }
 }
 
 @media (max-width: 767px) {
-  .focus-skills-shell {
+  .zen-space-shell {
     height: calc(100dvh - 64px);
     max-height: calc(100dvh - 64px);
     padding-inline: .75rem;
@@ -1360,164 +85,16 @@ body {
     padding-bottom: .25rem;
   }
 
-  .focus-skills-shell > header h1 {
+  .zen-space-shell > header h1 {
     font-size: 2rem;
   }
 
-  .focus-skills-shell > header {
+  .zen-space-shell > header {
     padding-bottom: .65rem;
   }
 
-  .focus-skills-shell > .flex.gap-5 {
+  .zen-space-shell > .flex.gap-5 {
     gap: 1.25rem;
-  }
-
-  .focus-session-stage {
-    height: 100%;
-    flex: 1 1 auto;
-    padding: .65rem;
-    border-radius: 1.2rem;
-  }
-
-  .focus-session-dashboard {
-    height: 100%;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: .85rem;
-    padding-top: .25rem;
-  }
-
-  .focus-session-mobile-header {
-    min-height: 3rem;
-    margin-bottom: .25rem;
-  }
-
-  .focus-session-mobile-header .focus-profile-avatar {
-    width: 2.45rem;
-    height: 2.45rem;
-  }
-
-  .focus-profile-name {
-    font-size: .84rem;
-  }
-
-  .focus-profile-level {
-    font-size: .58rem;
-  }
-
-  .focus-session-dashboard-visual {
-    order: 1;
-  }
-
-  .focus-session-dashboard-copy {
-    order: 2;
-    max-width: none;
-    text-align: left;
-  }
-
-  .focus-session-dashboard-date {
-    display: none;
-  }
-
-  .focus-session-dashboard-art {
-    width: min(88vw, 390px);
-    padding: 0;
-    border-radius: 1.35rem;
-  }
-
-  .focus-session-dashboard-visual .focus-visual-label {
-    margin-top: .45rem;
-    font-size: .56rem;
-  }
-
-  .focus-session-dashboard-visual .focus-countdown {
-    margin-top: .22rem;
-    font-size: clamp(3.3rem, 16vw, 4.8rem);
-  }
-
-  .focus-session-dashboard-visual .focus-progress-wrap {
-    width: min(100%, 420px);
-    margin-top: .65rem;
-  }
-
-  .focus-session-dashboard-visual .focus-progress-track {
-    height: .7rem;
-  }
-
-  .focus-session-dashboard-visual .focus-progress-meta {
-    font-size: .55rem;
-  }
-
-  .focus-session-dashboard-copy h1 {
-    font-size: clamp(2.7rem, 14vw, 4.1rem);
-  }
-
-  .focus-session-dashboard-copy .focus-mode-subtitle {
-    margin-top: .5rem;
-    font-size: .92rem;
-  }
-
-  .focus-session-dashboard-actions {
-    margin-top: .9rem;
-    width: 100%;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: .45rem;
-  }
-
-  .focus-session-dashboard-actions .focus-control-button {
-    min-height: 3rem;
-    padding-inline: .35rem;
-    font-size: .56rem;
-    letter-spacing: .06em;
-  }
-
-  .focus-session-dashboard .focus-quote {
-    margin-top: .8rem;
-    font-size: .78rem;
-    line-height: 1.35;
-  }
-
-  .focus-session-dashboard .focus-end-button {
-    margin-top: .55rem;
-    font-size: .56rem;
-  }
-}
-
-@media (max-width: 767px) and (max-height: 760px) {
-  .focus-session-stage {
-    padding: .55rem;
-  }
-
-  .focus-session-dashboard {
-    gap: .55rem;
-    min-height: 0;
-  }
-
-  .focus-session-dashboard-art {
-    width: min(76vw, 315px);
-  }
-
-  .focus-session-dashboard-visual .focus-countdown {
-    font-size: clamp(2.9rem, 13vw, 4rem);
-  }
-
-  .focus-session-dashboard-copy h1 {
-    font-size: clamp(2.35rem, 12vw, 3.7rem);
-  }
-
-  .focus-session-dashboard-actions {
-    margin-top: .68rem;
-  }
-
-  .focus-session-dashboard-actions .focus-control-button {
-    min-height: 2.7rem;
-  }
-
-  .focus-session-dashboard .focus-quote {
-    margin-top: .55rem;
-    font-size: .7rem;
   }
 }
 
@@ -1525,225 +102,58 @@ body {
 /* ZenSpace session polish v7: tighten the page chrome and make the active
    session reliably fit inside the visible desktop viewport without forcing
    the illustration/timer below the fold. */
-.focus-skills-shell > header {
+.zen-space-shell > header {
   padding-bottom: .55rem !important;
 }
 
-.focus-skills-shell > header p {
+.zen-space-shell > header p {
   margin-bottom: .15rem;
   line-height: 1;
 }
 
-.focus-skills-shell > header h1 {
+.zen-space-shell > header h1 {
   font-size: clamp(1.8rem, 2.5vw, 2.35rem) !important;
   line-height: .98;
 }
 
-.focus-skills-shell > .flex.gap-5 {
+.zen-space-shell > .flex.gap-5 {
   gap: 1.1rem !important;
 }
 
-.focus-skills-shell > .flex.gap-5 button {
+.zen-space-shell > .flex.gap-5 button {
   padding-bottom: .52rem !important;
   line-height: 1;
-}
-
-.focus-session-stage {
-  padding: clamp(.55rem, 1vw, .9rem) !important;
-}
-
-@media (min-width: 768px) {
-  .focus-session-mobile-header {
-    min-height: 2.9rem;
-    margin-bottom: .45rem;
-  }
-
-  .focus-session-mobile-header .focus-profile-avatar {
-    width: 2.45rem;
-    height: 2.45rem;
-  }
-
-  .focus-profile-name {
-    font-size: .82rem;
-  }
-
-  .focus-profile-level {
-    font-size: .58rem;
-  }
-
-  .focus-session-dashboard {
-    min-height: 0;
-    height: calc(100% - 3.35rem);
-    grid-template-columns: minmax(250px, .82fr) minmax(360px, 1.18fr);
-    gap: clamp(1.35rem, 3vw, 3.25rem);
-    padding: 0;
-    align-items: center;
-    align-content: center;
-    justify-content: center;
-  }
-
-  .focus-session-dashboard-copy {
-    max-width: 500px;
-    align-self: center;
-  }
-
-  .focus-session-dashboard-copy h1 {
-    font-size: clamp(2.55rem, 4.2vw, 4.35rem);
-    line-height: .9;
-  }
-
-  .focus-session-dashboard-copy .focus-mode-subtitle {
-    margin-top: .55rem;
-    font-size: clamp(.88rem, 1.05vw, 1.08rem);
-  }
-
-  .focus-session-dashboard-actions {
-    margin-top: 1rem;
-    gap: .5rem;
-    max-width: 560px;
-  }
-
-  .focus-session-dashboard-actions .focus-control-button {
-    min-height: 2.7rem;
-    padding-inline: .7rem;
-    font-size: .58rem;
-  }
-
-  .focus-session-dashboard .focus-quote {
-    margin-top: .95rem;
-    font-size: .78rem;
-    line-height: 1.35;
-  }
-
-  .focus-session-dashboard .focus-end-button {
-    margin-top: .55rem;
-    font-size: .58rem;
-  }
-
-  .focus-session-dashboard-visual {
-    max-height: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .focus-session-dashboard-date {
-    margin-bottom: .35rem;
-    font-size: .54rem;
-    letter-spacing: .22em;
-    flex: 0 0 auto;
-  }
-
-  .focus-session-dashboard-art {
-    width: min(28vh, 100%, 365px);
-    max-width: 365px;
-    flex: 0 1 auto;
-  }
-
-  .focus-session-dashboard-visual .focus-visual-label {
-    margin-top: .35rem;
-    font-size: .54rem;
-    flex: 0 0 auto;
-  }
-
-  .focus-session-dashboard-visual .focus-countdown {
-    margin-top: .16rem;
-    font-size: clamp(1.8rem, 4.4vh, 4.7rem);
-    line-height: .88;
-    flex: 0 0 auto;
-  }
-
-  .focus-session-dashboard-visual .focus-progress-wrap {
-    margin-top: .48rem;
-    width: min(100%, 510px);
-    flex: 0 0 auto;
-  }
-
-  .focus-session-dashboard-visual .focus-progress-track {
-    height: .62rem;
-  }
-
-  .focus-session-dashboard-visual .focus-progress-meta {
-    margin-top: .3rem;
-    font-size: .52rem;
-  }
 }
 
 /* ZenSpace session polish v8: keep the timer card inside the visible
    viewport on shorter/laptop windows instead of letting the countdown
    run past the fold. */
-@media (min-width: 768px) and (max-height: 900px) {
-  .focus-session-dashboard-art {
-    width: min(22vh, 100%, 260px);
-  }
-
-  .focus-session-dashboard-visual .focus-countdown {
-    font-size: clamp(1.6rem, 3.6vh, 3.6rem);
-    margin-top: .1rem;
-  }
-
-  .focus-session-dashboard-visual .focus-visual-label {
-    margin-top: .2rem;
-  }
-
-  .focus-session-dashboard-visual .focus-progress-wrap {
-    margin-top: .3rem;
-  }
-
-  .focus-session-dashboard-copy h1 {
-    font-size: clamp(2rem, 3.4vw, 3.4rem);
-  }
-
-  .focus-session-dashboard-actions {
-    margin-top: .6rem;
-  }
-
-  .focus-session-dashboard .focus-quote {
-    margin-top: .5rem;
-  }
-}
-
-@media (min-width: 768px) and (max-height: 720px) {
-  .focus-session-dashboard-art {
-    width: min(18vh, 100%, 200px);
-  }
-
-  .focus-session-dashboard-visual .focus-countdown {
-    font-size: clamp(1.4rem, 2.8vh, 2.8rem);
-  }
-
-  .focus-session-dashboard-copy h1 {
-    font-size: clamp(1.7rem, 2.8vw, 2.6rem);
-  }
-}
 
 @media (max-width: 767px) {
-  .focus-skills-shell > header {
+  .zen-space-shell > header {
     padding-bottom: .42rem !important;
   }
 
-  .focus-skills-shell > header h1 {
+  .zen-space-shell > header h1 {
     font-size: 1.9rem !important;
   }
 
-  .focus-skills-shell > .flex.gap-5 {
+  .zen-space-shell > .flex.gap-5 {
     gap: .9rem !important;
   }
 
-  .focus-skills-shell > .flex.gap-5 button {
+  .zen-space-shell > .flex.gap-5 button {
     padding-bottom: .45rem !important;
   }
 }
 
 /* ZenSpace challenge section — matched to the supplied desktop + mobile reference. */
-.focus-skills-shell {
+.zen-space-shell {
   width: 100%;
   max-width: 100%;
 }
 
-.focus-skills-header {
+.zen-space-header {
   position: relative;
   min-height: 6.6rem;
   display: flex;
@@ -1753,11 +163,11 @@ body {
   padding: .2rem 0 .9rem;
 }
 
-.focus-skills-heading {
+.zen-space-heading {
   min-width: 0;
 }
 
-.focus-skills-eyebrow {
+.zen-space-eyebrow {
   margin: 0 0 .25rem;
   color: var(--accent);
   font-size: .7rem;
@@ -1767,7 +177,7 @@ body {
   letter-spacing: .22em;
 }
 
-.focus-skills-heading h1 {
+.zen-space-heading h1 {
   margin: 0;
   color: var(--ink);
   font-family: var(--font-serif, Georgia, serif);
@@ -1777,14 +187,14 @@ body {
   letter-spacing: -.02em;
 }
 
-.focus-skills-subtitle {
+.zen-space-subtitle {
   margin: .45rem 0 0;
   color: var(--ink-soft);
   font-size: .82rem;
   line-height: 1.35;
 }
 
-.focus-skills-header-actions {
+.zen-space-header-actions {
   display: flex;
   flex-direction: column-reverse;
   align-items: flex-end;
@@ -2010,33 +420,33 @@ body {
 }
 
 @media (min-width: 768px) {
-  .focus-skills-shell {
+  .zen-space-shell {
     padding-inline: 2.5rem !important;
   }
 }
 
 @media (min-width: 768px) and (max-width: 1100px) {
-  .focus-skills-shell {
+  .zen-space-shell {
     max-width: 776px;
     margin-inline: auto;
     padding-inline: 0 !important;
   }
 
-  .focus-skills-header {
+  .zen-space-header {
     min-height: 10rem;
     padding-top: .1rem;
   }
 
-  .focus-skills-heading h1 {
+  .zen-space-heading h1 {
     font-size: 3rem;
   }
 
-  .focus-skills-subtitle {
+  .zen-space-subtitle {
     max-width: 400px;
     font-size: 1.05rem;
   }
 
-  .focus-skills-header-actions {
+  .zen-space-header-actions {
     padding-top: 3rem;
     gap: .6rem;
   }
@@ -2131,25 +541,25 @@ body {
 }
 
 @media (max-width: 767px) {
-  .focus-skills-shell {
+  .zen-space-shell {
     padding-inline: .8rem !important;
   }
 
-  .focus-skills-header {
+  .zen-space-header {
     min-height: 9.1rem;
     padding-bottom: .85rem;
   }
 
-  .focus-skills-heading h1 {
+  .zen-space-heading h1 {
     font-size: 2rem;
   }
 
-  .focus-skills-subtitle {
+  .zen-space-subtitle {
     max-width: 52%;
     font-size: .82rem;
   }
 
-  .focus-skills-header-actions {
+  .zen-space-header-actions {
     padding-top: 2.7rem;
     gap: .45rem;
   }
@@ -2232,22 +642,22 @@ body {
 }
 
 @media (min-width: 1101px) {
-  .focus-skills-header {
+  .zen-space-header {
     min-height: 6.6rem;
     padding: .2rem 0 .9rem;
   }
 
-  .focus-skills-heading h1 {
+  .zen-space-heading h1 {
     font-size: clamp(2.45rem, 3vw, 3rem) !important;
     line-height: .98;
   }
 
-  .focus-skills-subtitle {
+  .zen-space-subtitle {
     margin-top: .5rem;
     font-size: .9rem;
   }
 
-  .focus-skills-header-actions {
+  .zen-space-header-actions {
     padding-top: .05rem;
     gap: .7rem;
   }
@@ -2361,28 +771,28 @@ body {
 /* Reference mobile/tablet composition: the card intentionally becomes a
    compact vertical block rather than a shrunken desktop row. */
 @media (min-width: 768px) and (max-width: 1100px) {
-  .focus-skills-shell {
+  .zen-space-shell {
     max-width: 776px;
     margin-inline: auto;
     padding-inline: 0 !important;
   }
 
-  .focus-skills-header {
+  .zen-space-header {
     min-height: 10rem;
     padding-top: .1rem;
   }
 
-  .focus-skills-heading h1 {
+  .zen-space-heading h1 {
     font-size: 3rem !important;
   }
 
-  .focus-skills-subtitle {
+  .zen-space-subtitle {
     max-width: 400px;
     font-size: 1.05rem;
     line-height: 1.35;
   }
 
-  .focus-skills-header-actions {
+  .zen-space-header-actions {
     padding-top: 3rem;
     gap: .6rem;
   }
@@ -2500,25 +910,25 @@ body {
 }
 
 @media (max-width: 767px) {
-  .focus-skills-shell {
+  .zen-space-shell {
     padding-inline: .8rem !important;
   }
 
-  .focus-skills-header {
+  .zen-space-header {
     min-height: 9.1rem;
     padding-bottom: .85rem;
   }
 
-  .focus-skills-heading h1 {
+  .zen-space-heading h1 {
     font-size: 2rem !important;
   }
 
-  .focus-skills-subtitle {
+  .zen-space-subtitle {
     max-width: 52%;
     font-size: .82rem;
   }
 
-  .focus-skills-header-actions {
+  .zen-space-header-actions {
     padding-top: 2.7rem;
     gap: .45rem;
   }
@@ -2704,1439 +1114,16 @@ body {
 }
 
 
-/* Focus Mode reference-match v9
-   Presentation-only overrides: session/timer/state logic remains unchanged. */
-.focus-active-shell:fullscreen,
-.focus-active-shell:fullscreen .focus-session-frame,
-.focus-active-shell:fullscreen .focus-fullscreen-panel {
-  background: #0d0c0b !important;
-  color: #f3efe6;
-  background-image: none !important;
-}
 
-.focus-active-shell:fullscreen .focus-fullscreen-panel {
-  box-sizing: border-box;
-  padding: clamp(1.25rem, 2.4vw, 2.5rem) clamp(1.35rem, 4vw, 4.75rem);
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-topbar {
-  position: relative;
-  top: auto;
-  left: auto;
-  right: auto;
-  min-height: 3.15rem;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-grid {
-  width: min(1480px, 100%);
-  height: calc(100% - 3.15rem);
-  grid-template-columns: minmax(0, 1fr) minmax(420px, .92fr);
-  gap: clamp(3rem, 6vw, 7rem);
-  align-items: center;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-copy {
-  padding-left: clamp(0rem, 1vw, 1rem);
-  max-width: 690px;
-  justify-self: start;
-}
-
-.focus-active-shell:fullscreen .focus-mode-eyebrow {
-  font-size: clamp(.66rem, .72vw, .78rem);
-  letter-spacing: .30em;
-}
-
-.focus-active-shell:fullscreen .focus-mode-eyebrow span {
-  width: clamp(1.7rem, 2.7vw, 2.6rem);
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-copy h1 {
-  margin-top: .95rem;
-  max-width: 680px;
-  font-size: clamp(3.6rem, 7vw, 7.8rem);
-  line-height: .9;
-  letter-spacing: -.065em;
-}
-
-.focus-active-shell:fullscreen .focus-mode-subtitle {
-  margin-top: 1.15rem;
-  max-width: 620px;
-  font-size: clamp(1rem, 1.35vw, 1.28rem);
-  color: rgba(243,239,230,.52);
-}
-
-.focus-live-datetime {
-  margin-top: 1.45rem;
-  color: #f39a3d;
-  font-size: clamp(.78rem, .9vw, .95rem);
-  font-weight: 800;
-  letter-spacing: .20em;
-  font-variant-numeric: tabular-nums;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-action-row {
-  display: flex;
-  flex-wrap: wrap;
-  width: auto;
-  max-width: none;
-  margin-top: 1.55rem;
-  gap: .7rem;
-}
-
-.focus-active-shell:fullscreen .focus-control-button {
-  min-height: 3.25rem;
-  flex: 0 0 auto;
-  padding-inline: 1.15rem;
-  border-radius: .82rem;
-}
-
-.focus-active-shell:fullscreen .focus-quote {
-  max-width: 600px;
-  margin-top: 2rem;
-  font-size: clamp(.88rem, 1vw, 1rem);
-  line-height: 1.55;
-}
-
-.focus-active-shell:fullscreen .focus-end-button {
-  margin-top: 1rem;
-  font-size: .67rem;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-visual {
-  width: min(100%, 620px);
-  justify-self: center;
-  align-self: center;
-  min-width: 0;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-art {
-  width: min(100%, 540px);
-  max-height: none;
-  margin-inline: auto;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-art > .focus-study-illustration {
-  width: 100%;
-  max-width: 540px;
-}
-
-.focus-active-shell:fullscreen .focus-visual-label {
-  margin-top: 1rem;
-  font-size: .66rem;
-  letter-spacing: .38em;
-}
-
-.focus-active-shell:fullscreen .focus-countdown {
-  margin-top: .45rem;
-  font-size: clamp(4.2rem, 6.6vw, 7.2rem);
-  line-height: .86;
-  letter-spacing: -.04em;
-  font-weight: 300;
-}
-
-.focus-active-shell:fullscreen .focus-progress-wrap {
-  width: min(100%, 590px);
-  margin-top: 1.45rem;
-}
-
-.focus-active-shell:fullscreen .focus-progress-track {
-  height: 1rem;
-  background: rgba(255,255,255,.13);
-  box-shadow: none;
-}
-
-.focus-active-shell:fullscreen .focus-progress-meta {
-  margin-top: .65rem;
-  color: rgba(243,239,230,.52);
-  font-size: .66rem;
-  letter-spacing: .11em;
-}
-
-@media (max-width: 1100px) and (min-width: 768px) {
-  .focus-active-shell:fullscreen .focus-fullscreen-panel {
-    padding-inline: 2rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-grid {
-    grid-template-columns: minmax(0, .95fr) minmax(360px, 1.05fr);
-    gap: 2.5rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-copy h1 {
-    font-size: clamp(3rem, 6.5vw, 5.5rem);
-  }
-
-  .focus-active-shell:fullscreen .focus-live-datetime {
-    margin-top: 1.1rem;
-  }
-}
 
 @media (max-width: 767px) {
-  .focus-active-shell:fullscreen {
-    overflow-y: auto;
-  }
 
-  .focus-active-shell:fullscreen .focus-session-frame {
-    height: auto;
-    min-height: 100dvh;
-    overflow: visible;
-  }
+  
 
-  .focus-active-shell:fullscreen .focus-fullscreen-panel {
-    min-height: 100dvh;
-    height: auto;
-    padding: .9rem .9rem 1.3rem;
-  }
 
-  .focus-active-shell:fullscreen .focus-fullscreen-topbar {
-    min-height: 2.8rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-grid {
-    height: auto;
-    margin-top: 1.4rem;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      "copy"
-      "visual";
-    gap: 2rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-copy {
-    grid-area: copy;
-    display: block;
-    max-width: none;
-    padding: 0;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-visual {
-    grid-area: visual;
-    display: flex;
-    width: 100%;
-    max-width: none;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-copy h1 {
-    margin-top: .7rem;
-    font-size: clamp(2.8rem, 14vw, 4.4rem);
-  }
-
-  .focus-active-shell:fullscreen .focus-mode-subtitle {
-    margin-top: .6rem;
-    font-size: .93rem;
-  }
-
-  .focus-live-datetime {
-    margin-top: .9rem;
-    font-size: .72rem;
-    letter-spacing: .14em;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-action-row {
-    width: 100%;
-    margin-top: 1.05rem;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: .5rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-control-button {
-    min-height: 3rem;
-    min-width: 0;
-    padding: .55rem .35rem;
-    font-size: .6rem;
-    letter-spacing: .07em;
-  }
-
-  .focus-active-shell:fullscreen .focus-quote {
-    margin-top: 1.2rem;
-    font-size: .82rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-end-button {
-    margin-top: .75rem;
-    font-size: .57rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-art {
-    width: min(82vw, 360px);
-    margin-inline: auto;
-  }
-
-  .focus-active-shell:fullscreen .focus-countdown {
-    font-size: clamp(3.5rem, 17vw, 5.2rem);
-  }
-
-  .focus-active-shell:fullscreen .focus-progress-wrap {
-    width: 100%;
-    margin-top: 1rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-progress-track {
-    height: .82rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-progress-meta {
-    font-size: .56rem;
-  }
-}
-
-@media (max-width: 767px) and (max-height: 760px) {
-  .focus-active-shell:fullscreen .focus-fullscreen-grid {
-    gap: 1.35rem;
-    margin-top: 1rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-copy h1 {
-    font-size: clamp(2.35rem, 12vw, 3.6rem);
-  }
-
-  .focus-live-datetime {
-    margin-top: .65rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-art {
-    width: min(75vw, 300px);
-  }
-
-  .focus-active-shell:fullscreen .focus-countdown {
-    font-size: clamp(2.9rem, 14vw, 4rem);
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-action-row {
-    margin-top: .8rem;
-  }
-}
-
-
-.focus-session-dashboard-copy .focus-live-datetime {
-  margin-top: 1rem;
-  color: #f39a3d;
-  font-size: .72rem;
-  font-weight: 800;
-  letter-spacing: .18em;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Focus Session v7 — close visual match to the supplied reference. */
-.focus-active-shell:fullscreen {
-  background: #0d0d0c !important;
-  color: #f4f1e9;
-}
-
-.focus-active-shell:fullscreen .focus-session-frame,
-.focus-active-shell:fullscreen .focus-fullscreen-stage,
-.focus-active-shell:fullscreen .focus-fullscreen-panel {
-  width: 100vw;
-  height: 100dvh;
-  min-height: 100dvh;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-panel {
-  position: relative;
-  box-sizing: border-box;
-  overflow: hidden;
-  padding: 2.1rem 3.45rem 2.5rem;
-  background:
-    radial-gradient(900px 520px at 53% 42%, rgba(255, 179, 88, 0.018), transparent 70%),
-    #0d0d0c;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-topbar {
-  position: fixed;
-  inset: 2.2rem 3.45rem auto 3.45rem;
-  min-height: 3.35rem;
-  z-index: 20;
-}
-
-.focus-active-shell:fullscreen .focus-profile-mini {
-  gap: .78rem;
-  min-width: 15rem;
-}
-
-.focus-active-shell:fullscreen .focus-profile-avatar {
-  width: 3.25rem;
-  height: 3.25rem;
-  border-color: rgba(255,255,255,.26);
-}
-
-.focus-active-shell:fullscreen .focus-profile-name {
-  white-space: nowrap;
-  font-size: .92rem;
-  line-height: 1.1;
-}
-
-.focus-active-shell:fullscreen .focus-profile-level {
-  margin-top: .24rem;
-  font-size: .69rem;
-  line-height: 1.1;
-  letter-spacing: .025em;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-icon-button {
-  width: 3.25rem;
-  height: 3.25rem;
-  border-radius: 1rem;
-  background: rgba(16,15,14,.46);
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-grid {
-  width: calc(100vw - 6.9rem);
-  max-width: none;
-  height: auto;
-  min-height: 0;
-  margin: 0 auto;
-  padding: 7.4rem 0 0;
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: minmax(650px, .9fr) minmax(620px, 1.1fr);
-  gap: clamp(3.2rem, 5.2vw, 6.5rem);
-  align-items: start;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-copy {
-  width: min(100%, 43rem);
-  padding: 8.2rem 0 0 2.4rem;
-}
-
-.focus-active-shell:fullscreen .focus-mode-eyebrow {
-  gap: .9rem;
-  font-size: .72rem;
-  letter-spacing: .34em;
-}
-
-.focus-active-shell:fullscreen .focus-mode-eyebrow span {
-  width: 2.7rem;
-  height: 1px;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-copy h1 {
-  max-width: 43rem;
-  margin-top: 1.05rem;
-  font-size: clamp(5.7rem, 7.15vw, 7.7rem);
-  line-height: .86;
-  font-weight: 800;
-  letter-spacing: -.065em;
-}
-
-.focus-active-shell:fullscreen .focus-mode-subtitle {
-  margin-top: 1.15rem;
-  color: rgba(243,239,230,.57);
-  font-size: clamp(1.25rem, 1.5vw, 1.5rem);
-  line-height: 1.2;
-}
-
-.focus-active-shell:fullscreen .focus-live-datetime {
-  margin-top: 2.15rem;
-  color: #f39a3d;
-  font-size: clamp(.95rem, 1vw, 1.06rem);
-  font-weight: 800;
-  letter-spacing: .16em;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-action-row {
-  width: min(100%, 43rem);
-  margin-top: 1.9rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 1rem;
-}
-
-.focus-active-shell:fullscreen .focus-control-button {
-  min-height: 3.6rem;
-  border-radius: .92rem;
-  padding: .72rem 1rem;
-  font-size: .76rem;
-  letter-spacing: .10em;
-}
-
-.focus-active-shell:fullscreen .focus-control-button-primary {
-  background: #f6a13f;
-  border-color: #f6a13f;
-  color: #17120d;
-}
-
-.focus-active-shell:fullscreen .focus-control-button-secondary {
-  background: rgba(255,255,255,.012);
-  border-color: rgba(255,255,255,.19);
-  color: #f3efe6;
-}
-
-.focus-active-shell:fullscreen .focus-quote {
-  max-width: 43rem;
-  margin-top: 3rem;
-  color: rgba(243,239,230,.72);
-  font-size: 1.03rem;
-  line-height: 1.55;
-}
-
-.focus-active-shell:fullscreen .focus-end-button {
-  margin-top: 1.65rem;
-  color: #ff8f79;
-  font-size: .71rem;
-  letter-spacing: .12em;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-visual {
-  width: min(100%, 49rem);
-  justify-self: center;
-  align-items: center;
-  justify-content: flex-start;
-  padding-top: .2rem;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-art {
-  width: min(100%, 35rem);
-  height: min(31rem, 47vh);
-  max-height: none;
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  border-radius: 1.7rem;
-  background: #11110f;
-}
-
-.focus-active-shell:fullscreen .focus-fullscreen-art > .focus-study-illustration {
-  width: min(100%, 31rem);
-  height: min(100%, 31rem);
-  max-width: none;
-  max-height: none;
-}
-
-.focus-active-shell:fullscreen .focus-visual-label {
-  margin-top: 1.3rem;
-  color: rgba(243,239,230,.66);
-  font-size: .68rem;
-  letter-spacing: .43em;
-}
-
-.focus-active-shell:fullscreen .focus-countdown {
-  margin-top: .45rem;
-  color: #f39a3d;
-  font-size: clamp(5.1rem, 6.4vw, 7rem);
-  line-height: .9;
-  font-weight: 300;
-  letter-spacing: -.05em;
-}
-
-.focus-active-shell:fullscreen .focus-progress-wrap {
-  width: min(100%, 45rem);
-  margin-top: 1.45rem;
-}
-
-.focus-active-shell:fullscreen .focus-progress-track {
-  height: .9rem;
-  background: rgba(255,255,255,.11);
-}
-
-.focus-active-shell:fullscreen .focus-progress-meta {
-  margin-top: .56rem;
-  color: rgba(243,239,230,.52);
-  font-size: .7rem;
-  letter-spacing: .04em;
-}
-
-@media (max-width: 1250px) and (min-width: 768px) {
-  .focus-active-shell:fullscreen .focus-fullscreen-panel {
-    padding-inline: 2.1rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-topbar {
-    inset-inline: 2.1rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-grid {
-    width: calc(100vw - 4.2rem);
-    grid-template-columns: minmax(500px, .92fr) minmax(450px, 1.08fr);
-    gap: 2.3rem;
-    padding-top: 6.7rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-copy {
-    padding-top: 5.2rem;
-    padding-left: .25rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-copy h1 {
-    font-size: clamp(4.7rem, 7vw, 6.1rem);
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-action-row {
-    gap: .65rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-control-button {
-    padding-inline: .6rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-art {
-    width: min(100%, 29rem);
-    height: min(28rem, 46vh);
-  }
-
-  .focus-active-shell:fullscreen .focus-countdown {
-    font-size: clamp(4.5rem, 6.2vw, 6rem);
-  }
-}
-
-@media (max-width: 767px) {
-  .focus-active-shell:fullscreen {
-    overflow-y: auto;
-  }
-
-  .focus-active-shell:fullscreen .focus-session-frame,
-  .focus-active-shell:fullscreen .focus-fullscreen-stage,
-  .focus-active-shell:fullscreen .focus-fullscreen-panel {
-    height: auto;
-    min-height: 100dvh;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-panel {
-    padding: 1rem 1rem 1.6rem;
-    overflow: visible;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-topbar {
-    position: relative;
-    inset: auto;
-    min-height: 2.9rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-profile-mini {
-    min-width: 0;
-  }
-
-  .focus-active-shell:fullscreen .focus-profile-avatar,
-  .focus-active-shell:fullscreen .focus-fullscreen-icon-button {
-    width: 2.65rem;
-    height: 2.65rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-profile-name {
-    font-size: .82rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-profile-level {
-    font-size: .6rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-grid {
-    width: 100%;
-    margin-top: 1.8rem;
-    padding: 0;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-copy,
-  .focus-active-shell:fullscreen .focus-fullscreen-visual {
-    width: 100%;
-    padding: 0;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-copy {
-    display: contents;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-visual {
-    display: contents;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-art {
-    grid-row: 1;
-    justify-self: center;
-    width: min(82vw, 21rem);
-    height: min(82vw, 21rem);
-    margin-bottom: 1.25rem;
-    border-radius: 1.3rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-art > .focus-study-illustration {
-    width: 100%;
-    height: 100%;
-  }
-
-  .focus-active-shell:fullscreen .focus-mode-eyebrow {
-    grid-row: 2;
-    font-size: .62rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-copy h1 {
-    grid-row: 3;
-    margin-top: .55rem;
-    font-size: clamp(3.2rem, 14vw, 5rem);
-  }
-
-  .focus-active-shell:fullscreen .focus-mode-subtitle {
-    grid-row: 4;
-    margin-top: .75rem;
-    font-size: 1rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-live-datetime {
-    grid-row: 5;
-    margin-top: 1.2rem;
-    font-size: .78rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-action-row {
-    grid-row: 6;
-    width: 100%;
-    margin-top: 1.25rem;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: .55rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-control-button {
-    min-height: 3.05rem;
-    padding: .6rem .35rem;
-    font-size: .58rem;
-    letter-spacing: .06em;
-  }
-
-  .focus-active-shell:fullscreen .focus-quote {
-    grid-row: 7;
-    margin-top: 1.6rem;
-    font-size: .82rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-end-button {
-    grid-row: 8;
-    margin-top: .9rem;
-    font-size: .6rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-visual-label {
-    grid-row: 9;
-    margin-top: 1.5rem;
-    font-size: .58rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-countdown {
-    grid-row: 10;
-    margin-top: .42rem;
-    font-size: clamp(4rem, 17vw, 5.5rem);
-  }
-
-  .focus-active-shell:fullscreen .focus-progress-wrap {
-    grid-row: 11;
-    width: 100%;
-    margin-top: 1rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-progress-track {
-    height: .76rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-progress-meta {
-    font-size: .56rem;
-  }
-}
-
-/* Focus Session mobile reference pass — mobile/fullscreen only.
-   Deliberately scoped so desktop/laptop fullscreen styles above remain unchanged. */
-@media (max-width: 767px) {
-  .focus-active-shell:fullscreen .focus-fullscreen-panel {
-    padding: 0.95rem 1rem 1.5rem;
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-topbar {
-    margin: 0;
-    min-height: 2.85rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-grid {
-    width: 100%;
-    margin-top: 2rem;
-    padding: 0;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) clamp(7.2rem, 30vw, 9rem);
-    grid-template-rows: auto auto auto auto auto auto auto auto auto auto;
-    column-gap: 0.85rem;
-    row-gap: 0;
-    align-items: start;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-copy,
-  .focus-active-shell:fullscreen .focus-fullscreen-visual {
-    display: contents;
-    width: auto;
-    padding: 0;
-  }
-
-  .focus-active-shell:fullscreen .focus-mode-eyebrow {
-    grid-column: 1;
-    grid-row: 1;
-    align-self: center;
-    margin: 0;
-    gap: 0.7rem;
-    min-width: 0;
-    color: #f39a3d;
-    font-size: clamp(0.62rem, 2.7vw, 0.72rem);
-    line-height: 1;
-    letter-spacing: 0.22em;
-    white-space: nowrap;
-  }
-
-  .focus-active-shell:fullscreen .focus-mode-eyebrow span {
-    width: clamp(2.3rem, 13vw, 3.3rem);
-    height: 1px;
-    flex: 0 0 auto;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-copy h1 {
-    grid-column: 1;
-    grid-row: 2;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    margin: 0.5rem 0 0;
-    font-size: clamp(3.4rem, 18vw, 5.6rem);
-    line-height: 0.88;
-    font-weight: 800;
-    letter-spacing: -0.06em;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-  }
-
-  .focus-active-shell:fullscreen .focus-mode-subtitle {
-    grid-column: 1;
-    grid-row: 3;
-    min-width: 0;
-    margin: 0.55rem 0 0;
-    color: rgba(243, 239, 230, 0.63);
-    font-size: clamp(0.95rem, 4.1vw, 1.1rem);
-    line-height: 1.28;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-art {
-    grid-column: 2;
-    grid-row: 1 / span 3;
-    justify-self: end;
-    align-self: start;
-    width: clamp(7.2rem, 30vw, 9rem);
-    height: clamp(7.2rem, 30vw, 9rem);
-    margin: 0;
-    border-radius: 1.15rem;
-    background: #11110f;
-    overflow: hidden;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-art > .focus-study-illustration {
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    max-height: none;
-  }
-
-  .focus-active-shell:fullscreen .focus-live-datetime {
-    grid-column: 1 / -1;
-    grid-row: 4;
-    margin: 1.35rem 0 0;
-    color: #f39a3d;
-    font-size: clamp(0.7rem, 3.25vw, 0.86rem);
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: 0.12em;
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-action-row {
-    grid-column: 1 / -1;
-    grid-row: 5;
-    width: 100%;
-    margin: 1.15rem 0 0;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.62rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-control-button {
-    width: 100%;
-    min-width: 0;
-    min-height: 3.25rem;
-    padding: 0.75rem 0.9rem;
-    border-radius: 0.92rem;
-    font-size: clamp(0.65rem, 3vw, 0.8rem);
-    letter-spacing: 0.08em;
-  }
-
-  .focus-active-shell:fullscreen .focus-control-button-primary {
-    background: #f6a13f;
-    border-color: #f6a13f;
-    color: #17120d;
-  }
-
-  .focus-active-shell:fullscreen .focus-control-button-secondary {
-    background: rgba(255, 255, 255, 0.008);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: #f3efe6;
-  }
-
-  .focus-active-shell:fullscreen .focus-quote {
-    grid-column: 1 / -1;
-    grid-row: 6;
-    max-width: 100%;
-    margin: 1.55rem 0 0;
-    padding: 0 0.35rem;
-    color: rgba(243, 239, 230, 0.74);
-    font-size: clamp(0.88rem, 3.9vw, 1rem);
-    line-height: 1.5;
-  }
-
-  .focus-active-shell:fullscreen .focus-end-button {
-    grid-column: 1 / -1;
-    grid-row: 7;
-    justify-self: start;
-    margin: 1rem 0 0;
-    max-width: 100%;
-    color: #ff7967;
-    font-size: clamp(0.65rem, 3vw, 0.78rem);
-    font-weight: 800;
-    line-height: 1.2;
-    letter-spacing: 0.09em;
-    text-align: left;
-  }
-
-  .focus-active-shell:fullscreen .focus-visual-label {
-    grid-column: 1 / -1;
-    grid-row: 8;
-    margin: 2.1rem 0 0;
-    color: rgba(243, 239, 230, 0.52);
-    font-size: clamp(0.62rem, 3vw, 0.74rem);
-    line-height: 1;
-    letter-spacing: 0.34em;
-    text-align: center;
-  }
-
-  .focus-active-shell:fullscreen .focus-countdown {
-    grid-column: 1 / -1;
-    grid-row: 9;
-    margin: 0.35rem 0 0;
-    color: #f39a3d;
-    font-size: clamp(3.95rem, 18vw, 5.4rem);
-    line-height: 0.92;
-    font-weight: 300;
-    letter-spacing: -0.05em;
-    text-align: center;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .focus-active-shell:fullscreen .focus-progress-wrap {
-    grid-column: 1 / -1;
-    grid-row: 10;
-    width: 100%;
-    margin: 1rem 0 0;
-  }
-
-  .focus-active-shell:fullscreen .focus-progress-track {
-    width: 100%;
-    height: 0.86rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.13);
-    overflow: hidden;
-  }
-
-  .focus-active-shell:fullscreen .focus-progress-fill {
-    height: 100%;
-    border-radius: inherit;
-    background: #f6a13f;
-  }
-
-  .focus-active-shell:fullscreen .focus-progress-meta {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.62rem;
-    color: rgba(243, 239, 230, 0.55);
-    font-size: clamp(0.58rem, 2.65vw, 0.7rem);
-    line-height: 1;
-    letter-spacing: 0.02em;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .focus-active-shell:fullscreen .focus-progress-meta span:nth-child(1) {
-    text-align: left;
-  }
-
-  .focus-active-shell:fullscreen .focus-progress-meta span:nth-child(2) {
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  .focus-active-shell:fullscreen .focus-progress-meta span:nth-child(3) {
-    text-align: right;
-  }
 
 }
 
-@media (max-width: 380px) {
-  .focus-active-shell:fullscreen .focus-fullscreen-panel {
-    padding-inline: 0.85rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-grid {
-    grid-template-columns: minmax(0, 1fr) 6.9rem;
-    column-gap: 0.7rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-art {
-    width: 6.9rem;
-    height: 6.9rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-live-datetime {
-    letter-spacing: 0.085em;
-  }
-}
-
-/* Mobile fullscreen reference match — intentionally isolated from desktop (768px+). */
-@media (max-width: 767px) {
-  .focus-active-shell:fullscreen {
-    width: 100vw;
-    height: 100dvh;
-    min-height: 100dvh;
-    overflow: hidden;
-    background: #0f0e0c;
-  }
-
-  .focus-active-shell:fullscreen .focus-session-frame,
-  .focus-active-shell:fullscreen .focus-fullscreen-stage,
-  .focus-active-shell:fullscreen .focus-fullscreen-panel {
-    width: 100%;
-    height: 100%;
-    min-height: 100%;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-panel {
-    box-sizing: border-box;
-    padding: 0;
-    overflow: hidden;
-    background: #0f0e0c;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-topbar {
-    position: absolute;
-    top: 5.8vh;
-    left: 10.2vw;
-    right: 10.2vw;
-    min-height: 3.6rem;
-    z-index: 5;
-  }
-
-  .focus-active-shell:fullscreen .focus-profile-mini {
-    gap: .85rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-profile-avatar {
-    width: 3.9rem;
-    height: 3.9rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-profile-name {
-    font-size: 1.02rem;
-    line-height: 1.1;
-  }
-
-  .focus-active-shell:fullscreen .focus-profile-level {
-    margin-top: .22rem;
-    font-size: .78rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-icon-button {
-    width: 3.15rem;
-    height: 3.15rem;
-    border-radius: 1rem;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-grid {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 19.3vh 10.2vw 7.5vh;
-    box-sizing: border-box;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, .94fr);
-    grid-template-rows: auto auto auto auto auto auto auto auto auto auto;
-    column-gap: 4vw;
-    align-content: start;
-    align-items: start;
-    text-align: left;
-    overflow: hidden;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-copy,
-  .focus-active-shell:fullscreen .focus-fullscreen-visual {
-    display: contents;
-  }
-
-  .focus-active-shell:fullscreen .mobile-hero-eyebrow {
-    grid-column: 1;
-    grid-row: 1;
-    align-self: start;
-    margin: 0;
-    font-size: clamp(.68rem, 2.3vw, .84rem);
-    letter-spacing: .30em;
-    line-height: 1.2;
-    white-space: nowrap;
-  }
-
-  .focus-active-shell:fullscreen .mobile-hero-eyebrow span {
-    width: clamp(2rem, 8.5vw, 3rem);
-  }
-
-  .focus-active-shell:fullscreen .mobile-hero-title {
-    grid-column: 1;
-    grid-row: 2;
-    width: 100%;
-    max-width: 100%;
-    margin: 2.8vh 0 0;
-    font-size: clamp(4rem, 14.2vw, 6.5rem);
-    line-height: .86;
-    letter-spacing: -.065em;
-    overflow-wrap: normal;
-    word-break: normal;
-    white-space: nowrap;
-  }
-
-  .focus-active-shell:fullscreen .mobile-hero-subtitle {
-    grid-column: 1;
-    grid-row: 3;
-    max-width: 100%;
-    margin: 2.4vh 0 0;
-    font-size: clamp(1rem, 4.4vw, 1.45rem);
-    line-height: 1.32;
-  }
-
-  .focus-active-shell:fullscreen .mobile-hero-datetime {
-    grid-column: 1 / -1;
-    grid-row: 4;
-    margin: 5vh 0 0;
-    color: #f39a3d;
-    font-size: clamp(.88rem, 3.8vw, 1.28rem);
-    font-weight: 800;
-    letter-spacing: .12em;
-    line-height: 1.1;
-    white-space: nowrap;
-  }
-
-  .focus-active-shell:fullscreen .mobile-hero-art {
-    grid-column: 2;
-    grid-row: 1 / 4;
-    justify-self: end;
-    align-self: start;
-    width: min(100%, 312px);
-    margin: 0;
-    transform: translateY(-.2vh);
-  }
-
-  .focus-active-shell:fullscreen .mobile-hero-art .focus-study-illustration {
-    width: 100%;
-    max-width: none;
-    height: auto;
-  }
-
-  .focus-active-shell:fullscreen .mobile-hero-actions {
-    grid-column: 1 / -1;
-    grid-row: 5;
-    width: 100%;
-    margin: 3.5vh 0 0;
-    display: flex;
-    flex-direction: column;
-    gap: .85rem;
-  }
-
-  .focus-active-shell:fullscreen .mobile-hero-actions button {
-    width: 100%;
-    min-height: 4.55rem;
-    flex: none;
-    border-radius: 1.15rem;
-    padding: .9rem 1rem;
-    font-size: clamp(.78rem, 3.2vw, 1rem);
-    letter-spacing: .10em;
-  }
-
-  .focus-active-shell:fullscreen .mobile-hero-quote {
-    grid-column: 1 / -1;
-    grid-row: 6;
-    width: 100%;
-    max-width: none;
-    margin: 4.4vh 0 0;
-    padding: 0 .8vw;
-    box-sizing: border-box;
-    font-size: clamp(1rem, 4vw, 1.3rem);
-    line-height: 1.48;
-  }
-
-  .focus-active-shell:fullscreen .mobile-hero-end {
-    grid-column: 1 / -1;
-    grid-row: 7;
-    justify-self: start;
-    margin: 3.4vh 0 0;
-    font-size: clamp(.68rem, 2.8vw, .9rem);
-    letter-spacing: .10em;
-  }
-
-  .focus-active-shell:fullscreen .mobile-timer-label {
-    grid-column: 1 / -1;
-    grid-row: 8;
-    justify-self: center;
-    width: 100%;
-    margin: 5.4vh 0 0;
-    padding-top: 3.8vh;
-    border-top: 1px solid rgba(243,239,230,.20);
-    text-align: center;
-    font-size: clamp(.72rem, 3vw, .92rem);
-    letter-spacing: .34em;
-    line-height: 1;
-  }
-
-  .focus-active-shell:fullscreen .mobile-timer-countdown {
-    grid-column: 1 / -1;
-    grid-row: 9;
-    justify-self: center;
-    margin: 2.4vh 0 0;
-    font-size: clamp(4.8rem, 18vw, 8rem);
-    line-height: .82;
-    letter-spacing: -.055em;
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  .focus-active-shell:fullscreen .mobile-timer-progress {
-    grid-column: 1 / -1;
-    grid-row: 10;
-    width: 100%;
-    margin: 3.4vh 0 0;
-  }
-
-  .focus-active-shell:fullscreen .mobile-timer-progress .focus-progress-track {
-    height: .82rem;
-  }
-
-  .focus-active-shell:fullscreen .mobile-timer-progress .focus-progress-meta {
-    margin-top: .65rem;
-    font-size: clamp(.64rem, 2.8vw, .82rem);
-    letter-spacing: .02em;
-  }
-}
-
-@media (max-width: 374px) {
-  .focus-active-shell:fullscreen .focus-fullscreen-topbar {
-    left: 8.5vw;
-    right: 8.5vw;
-  }
-
-  .focus-active-shell:fullscreen .focus-fullscreen-grid {
-    padding-left: 8.5vw;
-    padding-right: 8.5vw;
-    column-gap: 3vw;
-  }
-
-  .focus-active-shell:fullscreen .focus-profile-avatar {
-    width: 3.45rem;
-    height: 3.45rem;
-  }
-
-  .focus-active-shell:fullscreen .mobile-hero-title {
-    font-size: clamp(3.65rem, 13.5vw, 5rem);
-  }
-
-  .focus-active-shell:fullscreen .mobile-hero-art {
-    width: min(100%, 270px);
-  }
-}
-
-/* MOBILE BUTTON WIDTH REFINEMENT ONLY
-   Buttons must span the exact same left/right edges as the title, subtitle,
-   quote and date above them (matches the reference screenshot) — full width
-   of the grid column, not inset. */
-@media (max-width: 767px) {
-  .focus-active-shell:fullscreen .mobile-hero-actions {
-    width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-
-  .focus-active-shell:fullscreen .mobile-hero-actions button {
-    width: 100% !important;
-  }
-}
-
-/* ============================================================
-   FOCUS MODE — MOBILE EXACT-MATCH OVERRIDE (final, authoritative)
-   Placed last in the file and using !important throughout so it
-   wins over any earlier conflicting mobile rules for this screen.
-   Scoped strictly to max-width:767px — desktop is untouched.
-   Targets only the non-fullscreen ".focus-session-dashboard"
-   branch (the one actually rendered on mobile, since the browser's
-   fullscreen request can silently fail on some mobile browsers).
-   ============================================================ */
-@media (max-width: 767px) {
-  .focus-session-dashboard {
-    position: relative !important;
-    display: block !important;
-    padding-left: 48px !important;
-    padding-right: 48px !important;
-    padding-top: 6px !important;
-    padding-bottom: 4px !important;
-  }
-
-  /* Hide the "FOCUS MODE" eyebrow label on mobile only */
-  .focus-session-dashboard-copy > .focus-mode-eyebrow {
-    display: none !important;
-  }
-
-  .focus-session-dashboard-copy {
-    position: relative !important;
-    z-index: 2 !important;
-    max-width: 100% !important;
-  }
-
-  .focus-session-dashboard-copy h1 {
-    margin: 0 !important;
-    max-width: 58% !important;
-    font-size: clamp(2.1rem, 11vw, 2.75rem) !important;
-    line-height: 0.98 !important;
-    letter-spacing: -0.02em !important;
-  }
-
-  .focus-session-dashboard-copy .focus-mode-subtitle {
-    margin-top: 0.3rem !important;
-    max-width: 58% !important;
-    font-size: 0.92rem !important;
-    line-height: 1.25 !important;
-  }
-
-  .focus-session-dashboard-copy .focus-live-datetime {
-    display: block !important;
-    margin-top: 0.9rem !important;
-    font-size: 0.82rem !important;
-    letter-spacing: 0.05em !important;
-  }
-
-  /* Buttons: compact, equal size, stacked, matching the reference exactly */
-  .focus-session-dashboard-actions {
-    margin-top: 1rem !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 14px !important;
-    max-width: 100% !important;
-  }
-
-  .focus-session-dashboard-actions .focus-control-button {
-    width: 100% !important;
-    height: 64px !important;
-    min-height: 64px !important;
-    border-radius: 18px !important;
-    font-size: 0.82rem !important;
-    padding: 0 1rem !important;
-  }
-
-  .focus-session-dashboard > .focus-session-dashboard-copy > .focus-quote {
-    margin-top: 1.1rem !important;
-    max-width: 100% !important;
-    font-size: 0.92rem !important;
-  }
-
-  .focus-session-dashboard > .focus-session-dashboard-copy > .focus-end-button {
-    margin-top: 0.6rem !important;
-    display: block !important;
-  }
-
-  /* Animation: small, pinned near the title, not centered on the page */
-  .focus-session-dashboard-visual {
-    margin-top: 1.3rem !important;
-    display: block !important;
-  }
-
-  .focus-session-dashboard-art {
-    position: absolute !important;
-    top: 2px !important;
-    right: 48px !important;
-    width: 36% !important;
-    max-width: 140px !important;
-    aspect-ratio: 1 / 1 !important;
-    padding: 0.35rem !important;
-  }
-
-  .focus-session-dashboard-art .focus-study-illustration {
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  /* Divider sits directly above the FOCUS SESSION label */
-  .focus-session-dashboard-visual .focus-visual-label {
-    position: relative !important;
-    margin-top: 0 !important;
-    padding-top: 14px !important;
-    text-align: left !important;
-  }
-
-  .focus-session-dashboard-visual .focus-visual-label::before {
-    content: "" !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 1px !important;
-    background: var(--rule) !important;
-  }
-
-  .focus-session-dashboard-visual .focus-countdown {
-    text-align: center !important;
-    margin-top: 0.25rem !important;
-  }
-
-  .focus-session-dashboard-visual .focus-progress-wrap {
-    margin-top: 0.6rem !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  .focus-session-dashboard-visual .focus-progress-track {
-    height: 12px !important;
-    border-radius: 999px !important;
-  }
-
-  .focus-session-dashboard-visual .focus-progress-meta {
-    margin-top: 0.4rem !important;
-  }
-}
-
-/* ============================================================
-   ZENSPACE MOBILE FIX — Challenge tab content was being clipped
-   because .focus-skills-shell locks height to 100dvh with
-   overflow hidden (needed for the Focus Session running-timer
-   view), but that same lock was wrongly also applying to the
-   Challenge tab's variable-length card list, hiding content
-   below the fold. On mobile, when the Challenge tab is active,
-   let the shell flow naturally with the page's own scroll
-   instead of being height-locked. The Session tab keeps its
-   existing locked-height behavior untouched (needed for the
-   compact running-timer layout fixed earlier).
-   ============================================================ */
-@media (max-width: 767px) {
-  .focus-skills-shell.zen-tab-challenge {
-    height: auto !important;
-    max-height: none !important;
-    overflow-y: visible !important;
-    display: block !important;
-  }
-
-  .focus-skills-shell.zen-tab-challenge > * {
-    flex: none !important;
-  }
 
   /* Challenge cards: let height follow content instead of a fixed 148px
      box, so longer skill names/subtitles never get clipped or overflow. */
@@ -4147,21 +1134,6 @@ body {
     gap: 0.7rem !important;
   }
 
-  .zen-challenge-card-top {
-    flex-wrap: nowrap !important;
-  }
-
-  .zen-challenge-title-group h3 {
-    font-size: 1.05rem !important;
-    line-height: 1.2 !important;
-  }
-
-  .zen-challenge-card-bottom {
-    flex-wrap: wrap !important;
-    gap: 0.5rem !important;
-  }
-}
-
 /* ============================================================
    ZENSPACE MOBILE DENSITY PASS — shrink header + challenge cards
    so at least 3 challenge cards are visible without scrolling on
@@ -4169,23 +1141,23 @@ body {
    rules scoped to max-width:767px).
    ============================================================ */
 @media (max-width: 767px) {
-  .focus-skills-header {
+  .zen-space-header {
     margin-bottom: 0.6rem !important;
     gap: 0.5rem !important;
   }
 
-  .focus-skills-eyebrow {
+  .zen-space-eyebrow {
     font-size: 0.6rem !important;
     margin-bottom: 0.15rem !important;
   }
 
-  .focus-skills-heading h1 {
+  .zen-space-heading h1 {
     font-size: 1.5rem !important;
     line-height: 1.05 !important;
     margin: 0 !important;
   }
 
-  .focus-skills-subtitle {
+  .zen-space-subtitle {
     font-size: 0.68rem !important;
     line-height: 1.25 !important;
     margin-top: 0.2rem !important;
@@ -4202,9 +1174,8 @@ body {
     border-radius: 10px !important;
   }
 
-  /* Session/Challenge tab row */
-  .focus-skills-shell .flex.gap-5,
-  .focus-skills-shell .flex.gap-6 {
+  .zen-space-shell .flex.gap-5,
+  .zen-space-shell .flex.gap-6 {
     margin-top: 0.5rem !important;
     padding-bottom: 0.4rem !important;
   }
@@ -4284,5 +1255,543 @@ body {
     padding: 0 0.6rem !important;
     font-size: 0.62rem !important;
     border-radius: 8px !important;
+  }
+}
+
+/* ================================================================
+   FINAL VISUAL SYSTEM
+   Warm paper surfaces, restrained rules, rounded editorial cards,
+   and accessible touch targets based on the supplied reference UI.
+   ================================================================ */
+
+.edit-title-button {
+  inline-size: 38px;
+  block-size: 38px;
+  min-inline-size: 38px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 38px;
+  border: 1px solid var(--rule);
+  border-radius: 11px;
+  color: var(--ink-soft);
+  background: color-mix(in srgb, var(--accent) 5%, var(--paper-raised));
+  transition: border-color .18s ease, color .18s ease, background-color .18s ease, transform .18s ease;
+}
+
+.edit-title-button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--paper-raised));
+}
+
+.edit-title-button:active {
+  transform: scale(.96);
+}
+
+.edit-title-button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.zen-space-shell {
+  color: var(--ink);
+}
+
+.zen-space-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: .35rem 0 1.1rem;
+  margin-bottom: 1.15rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.zen-space-heading {
+  min-width: 0;
+}
+
+.zen-space-eyebrow {
+  margin: 0 0 .32rem;
+  color: var(--accent);
+  font-size: .67rem;
+  font-weight: 700;
+  letter-spacing: .23em;
+  text-transform: uppercase;
+}
+
+.zen-space-heading h1 {
+  margin: 0;
+  font-family: var(--font-source-serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  line-height: .98;
+  letter-spacing: -.035em;
+}
+
+.zen-space-subtitle {
+  margin: .48rem 0 0;
+  max-width: 42rem;
+  color: var(--ink-soft);
+  font-size: .9rem;
+  line-height: 1.45;
+}
+
+.zen-space-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .7rem;
+  flex-wrap: wrap;
+}
+
+.zen-new-challenge-button {
+  min-height: 44px;
+  padding: 0 1.05rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  background: var(--accent);
+  color: var(--paper-raised);
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+.zen-new-challenge-button:hover {
+  filter: brightness(.96);
+  transform: translateY(-1px);
+}
+
+.zen-new-challenge-button > span {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.zen-challenge-section {
+  min-width: 0;
+}
+
+.zen-feedback-error {
+  margin-bottom: .9rem;
+  padding: .85rem 1rem;
+  border: 1px solid color-mix(in srgb, #c63d32 28%, var(--rule));
+  border-radius: 14px;
+  background: color-mix(in srgb, #c63d32 5%, var(--paper-raised));
+  color: #a12f28;
+  font-size: .82rem;
+}
+
+.dark .zen-feedback-error {
+  color: #eeaaa3;
+}
+
+.zen-challenge-form {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  background: var(--paper-raised);
+  box-shadow: 0 7px 24px rgba(33,29,22,.04);
+}
+
+.zen-form-label {
+  display: block;
+  margin-bottom: .35rem;
+  color: var(--ink-soft);
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+}
+
+.zen-form-input,
+.zen-edit-input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: .65rem .8rem;
+  outline: none;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.zen-form-input:focus,
+.zen-edit-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.zen-days-input {
+  max-width: 180px;
+  margin-top: .55rem;
+}
+
+.zen-duration-button {
+  min-height: 38px;
+  padding: 0 .8rem;
+  border: 1px solid var(--rule);
+  border-radius: 11px;
+  color: var(--ink-soft);
+  background: var(--paper-raised);
+  font-size: .78rem;
+  font-weight: 650;
+  transition: border-color .18s ease, color .18s ease, background-color .18s ease;
+}
+
+.zen-duration-button:hover,
+.zen-duration-button.is-selected {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--paper-raised));
+}
+
+.zen-submit-button {
+  justify-self: start;
+  min-height: 42px;
+  padding: 0 1rem;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--paper-raised);
+  font-size: .8rem;
+  font-weight: 700;
+  transition: filter .18s ease, opacity .18s ease;
+}
+
+.zen-submit-button:hover:not(:disabled) {
+  filter: brightness(.96);
+}
+
+.zen-submit-button:disabled {
+  opacity: .42;
+  cursor: not-allowed;
+}
+
+.zen-empty-state {
+  padding: 2.6rem 1.2rem;
+  text-align: center;
+  border: 1px dashed var(--rule);
+  border-radius: 18px;
+  color: var(--ink-soft);
+  background: var(--paper-raised);
+  font-size: .82rem;
+}
+
+.zen-challenge-list {
+  display: grid !important;
+  gap: .82rem !important;
+}
+
+.zen-challenge-card {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: .92rem !important;
+  width: 100%;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: 1rem 1rem .95rem !important;
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--accent);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--accent) 4%, var(--paper-raised));
+  box-shadow: 0 6px 20px rgba(33,29,22,.035);
+  overflow: visible !important;
+  box-sizing: border-box;
+}
+
+.zen-challenge-card-top,
+.zen-challenge-card-bottom {
+  display: flex !important;
+}
+
+.zen-challenge-card-top {
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .9rem;
+}
+
+.zen-challenge-identity {
+  display: flex;
+  align-items: center;
+  gap: .78rem;
+  min-width: 0;
+}
+
+.zen-challenge-icon {
+  width: 48px !important;
+  height: 48px !important;
+  flex: 0 0 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--rule));
+  border-radius: 14px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--paper-raised));
+}
+
+.zen-challenge-icon svg {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+.zen-challenge-title-group {
+  min-width: 0;
+}
+
+.zen-challenge-title-group h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.08rem !important;
+  font-weight: 750;
+  line-height: 1.18;
+}
+
+.zen-challenge-title-group p {
+  margin: .3rem 0 0;
+  color: var(--ink-soft);
+  font-size: .73rem !important;
+  line-height: 1.3;
+}
+
+.zen-challenge-actions {
+  display: flex !important;
+  align-items: center;
+  gap: .42rem !important;
+  flex: 0 0 auto;
+}
+
+.zen-challenge-icon-button {
+  width: 38px !important;
+  height: 38px !important;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 38px;
+  border: 1px solid var(--rule);
+  border-radius: 11px;
+  color: var(--ink-soft);
+  background: color-mix(in srgb, var(--accent) 3%, var(--paper-raised));
+  transition: border-color .18s ease, color .18s ease, background-color .18s ease, transform .18s ease;
+}
+
+.zen-challenge-icon-button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 9%, var(--paper-raised));
+}
+
+.zen-challenge-icon-button:active {
+  transform: scale(.96);
+}
+
+.zen-challenge-progress-block {
+  display: block !important;
+  width: 100%;
+  min-width: 0;
+}
+
+.zen-challenge-progress-meta {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between !important;
+  margin-bottom: .34rem !important;
+  color: var(--ink-soft);
+  font-size: .68rem !important;
+}
+
+.zen-challenge-progress-track {
+  width: 100%;
+  height: 9px !important;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.zen-challenge-progress-fill {
+  height: 100%;
+  min-width: 3px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 72%, #f0b56d));
+  transition: width .35s ease;
+}
+
+.zen-challenge-card-bottom {
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin-top: .02rem;
+}
+
+.zen-challenge-streak {
+  display: flex !important;
+  align-items: center;
+  gap: .32rem !important;
+  color: var(--ink-soft);
+  font-size: .72rem !important;
+}
+
+.zen-challenge-flame {
+  font-size: 1rem !important;
+}
+
+.zen-challenge-streak-number {
+  color: var(--ink);
+  font-size: .82rem !important;
+  font-weight: 750;
+}
+
+.zen-checkin-button {
+  min-width: 124px !important;
+  height: 38px !important;
+  padding: 0 .85rem;
+  border: 1px solid var(--accent);
+  border-radius: 11px !important;
+  background: var(--accent);
+  color: var(--paper-raised);
+  font-size: .76rem !important;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  transition: filter .18s ease, background-color .18s ease, color .18s ease;
+}
+
+.zen-checkin-button:hover {
+  filter: brightness(.96);
+}
+
+.zen-checkin-button.is-done {
+  border-color: #4aa862;
+  background: color-mix(in srgb, #4aa862 14%, var(--paper-raised));
+  color: #2f8c46;
+}
+
+.zen-inline-save,
+.zen-inline-cancel {
+  min-height: 32px;
+  padding: 0 .55rem;
+  border-radius: 9px;
+  font-size: .67rem;
+  font-weight: 700;
+}
+
+.zen-inline-save {
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 7%, var(--paper-raised));
+}
+
+.zen-inline-cancel {
+  color: var(--ink-soft);
+}
+
+@media (max-width: 767px) {
+  .edit-title-button {
+    inline-size: 36px;
+    block-size: 36px;
+    min-inline-size: 36px;
+    flex-basis: 36px;
+    border-radius: 10px;
+  }
+
+  .zen-space-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: .85rem;
+    padding-bottom: .9rem;
+    margin-bottom: .9rem;
+  }
+
+  .zen-space-heading h1 {
+    font-size: 2rem;
+  }
+
+  .zen-space-subtitle {
+    max-width: 100%;
+    font-size: .78rem;
+  }
+
+  .zen-space-header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .zen-new-challenge-button {
+    flex: 1 1 auto;
+    min-height: 42px;
+  }
+
+  .zen-challenge-form {
+    border-radius: 16px;
+    padding: .9rem;
+  }
+
+  .zen-challenge-card {
+    gap: .72rem !important;
+    padding: .82rem .78rem .82rem !important;
+    border-radius: 16px;
+  }
+
+  .zen-challenge-card-top {
+    gap: .65rem;
+  }
+
+  .zen-challenge-icon {
+    width: 42px !important;
+    height: 42px !important;
+    flex-basis: 42px;
+    border-radius: 12px;
+  }
+
+  .zen-challenge-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .zen-challenge-title-group h3 {
+    font-size: .96rem !important;
+  }
+
+  .zen-challenge-title-group p {
+    font-size: .67rem !important;
+  }
+
+  .zen-challenge-actions {
+    gap: .32rem !important;
+  }
+
+  .zen-challenge-icon-button {
+    width: 34px !important;
+    height: 34px !important;
+    flex-basis: 34px;
+    border-radius: 10px;
+  }
+
+  .zen-challenge-progress-track {
+    height: 8px !important;
+  }
+
+  .zen-challenge-card-bottom {
+    gap: .5rem;
+  }
+
+  .zen-challenge-streak {
+    font-size: .67rem !important;
+  }
+
+  .zen-checkin-button {
+    min-width: 116px !important;
+    height: 36px !important;
+    padding-inline: .7rem;
+    font-size: .68rem !important;
   }
 }

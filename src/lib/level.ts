@@ -11,10 +11,6 @@ interface SkillLike {
   startDate?: string;
   completedDates: string[];
 }
-interface FocusRecordLike {
-  completedAt: string;
-}
-
 function localDateKey(d: Date): string {
   return d.toDateString();
 }
@@ -23,15 +19,14 @@ function localDateKey(d: Date): string {
  * One level per calendar day with real activity, never counting future work.
  *
  * Calendar events count for the day they occur (including today), while
- * completed tasks, skill check-ins, and saved focus sessions count from their
+ * completed tasks and skill check-ins count from their
  * actual completion/check-in timestamp. Future events are deliberately ignored
  * so a calendar full of upcoming/recurring items cannot inflate the level.
  */
 export function computeActiveDates(
   events: EventLike[],
   tasks: TaskLike[],
-  skills: SkillLike[],
-  focusSessions: FocusRecordLike[]
+  skills: SkillLike[]
 ): Set<string> {
   const active = new Set<string>();
   const now = new Date();
@@ -54,11 +49,6 @@ export function computeActiveDates(
       if (!Number.isNaN(d.getTime()) && d.getTime() <= now.getTime()) appActivityTimes.push(d.getTime());
     }
   }
-  for (const f of focusSessions) {
-    const d = new Date(f.completedAt);
-    if (!Number.isNaN(d.getTime()) && d.getTime() <= now.getTime()) appActivityTimes.push(d.getTime());
-  }
-
   const activityStart = appActivityTimes.length ? Math.min(...appActivityTimes) : now.getTime();
 
   for (const e of events) {
@@ -92,13 +82,6 @@ export function computeActiveDates(
       if (!Number.isNaN(date.getTime()) && date.getTime() <= now.getTime()) {
         active.add(localDateKey(date));
       }
-    }
-  }
-
-  for (const f of focusSessions) {
-    const date = new Date(f.completedAt);
-    if (!Number.isNaN(date.getTime()) && date.getTime() <= now.getTime()) {
-      active.add(localDateKey(date));
     }
   }
 

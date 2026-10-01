@@ -100,34 +100,6 @@ export function useSkillsData() {
   return { skills, syncState, error, refresh };
 }
 
-export function useFocusSessionHistory() {
-  const { status: sessionStatus } = useSession();
-  const [sessions, setSessions] = useState<
-    { id: string; title: string; durationMinutes: number; completedAt: string }[]
-  >([]);
-  const [syncState, setSyncState] = useState<SyncState>("idle");
-
-  const refresh = useCallback(async () => {
-    if (sessionStatus !== "authenticated") return;
-    setSyncState("syncing");
-    try {
-      const res = await fetch("/api/focus-sessions");
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed to load focus sessions");
-      setSessions(data.sessions ?? []);
-      setSyncState("idle");
-    } catch {
-      setSyncState("error");
-    }
-  }, [sessionStatus]);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  return { sessions, syncState, refresh };
-}
-
 // Level = one point per distinct day with any real activity. The set of
 // qualifying days is ALSO permanently logged to a hidden Google Task list
 // (see level-sync.ts): live data (the calendar's rolling fetch window, or a
@@ -140,13 +112,12 @@ export function useFocusSessionHistory() {
 export function useLevelFromData(
   events: GoogleEvent[],
   tasks: GoogleTask[],
-  skills: { id: string; name: string; durationDays: number; startDate: string; completedDates: string[] }[],
-  sessions: { id: string; title: string; durationMinutes: number; completedAt: string }[]
+  skills: { id: string; name: string; durationDays: number; startDate: string; completedDates: string[] }[]
 ) {
   const { status: sessionStatus } = useSession();
   const [loggedDays, setLoggedDays] = useState<string[]>([]);
 
-  const liveActiveDates = computeActiveDates(events, tasks, skills, sessions);
+  const liveActiveDates = computeActiveDates(events, tasks, skills);
   const liveKey = JSON.stringify(Array.from(liveActiveDates).sort());
   const loggedKey = JSON.stringify(loggedDays);
 
@@ -193,6 +164,5 @@ export function useLevel() {
   const { events } = useCalendarData();
   const { tasks } = useTasksData();
   const { skills } = useSkillsData();
-  const { sessions } = useFocusSessionHistory();
-  return useLevelFromData(events, tasks, skills, sessions);
+  return useLevelFromData(events, tasks, skills);
 }
