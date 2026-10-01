@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 import {
   IconArrowRight,
@@ -501,7 +502,11 @@ export function FocusSession() {
             <header className="focus-session-mobile-header">
               <div className="focus-profile-mini">
                 <div className="focus-profile-avatar">
-                  {profileImage ? <img src={profileImage} alt="" /> : <IconProfile className="h-7 w-7" />}
+                  {profileImage ? (
+                    <Image src={profileImage} alt="" width={28} height={28} className="h-full w-full object-cover" />
+                  ) : (
+                    <IconProfile className="h-7 w-7" />
+                  )}
                 </div>
                 <div className="min-w-0">
                   <p className="focus-profile-name">{displayName}</p>
@@ -520,7 +525,7 @@ export function FocusSession() {
                 <div className="focus-profile-mini">
                   <div className="focus-profile-avatar">
                     {profileImage ? (
-                      <img src={profileImage} alt="" />
+                      <Image src={profileImage} alt="" width={28} height={28} className="h-full w-full object-cover" />
                     ) : (
                       <IconProfile className="h-7 w-7" />
                     )}
