@@ -12,7 +12,7 @@ import {
   toggleTodayCheckIn,
 } from "@/lib/skills";
 import { SyncStatus } from "@/components/SyncStatus";
-import { IconTrash, IconShare, IconFocus, IconTrophy } from "@/components/icons";
+import { IconTrash, IconPencil, IconShare, IconFocus, IconTrophy } from "@/components/icons";
 import { FocusSession } from "@/components/FocusSession";
 import { generateShareCard, shareOrDownload } from "@/lib/shareCard";
 import { useLevel } from "@/lib/use-google-data";
@@ -32,6 +32,9 @@ export default function SkillsPage() {
   const [customDays, setCustomDays] = useState("");
   const [useCustom, setUseCustom] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [editingSkillId, setEditingSkillId] = useState<string | null>(null);
+  const [editSkillName, setEditSkillName] = useState("");
+  const [editingSkillSavingId, setEditingSkillSavingId] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (sessionStatus !== "authenticated") return;
@@ -76,6 +79,40 @@ export default function SkillsPage() {
       setSyncState("error");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const startSkillEdit = (id: string, currentName: string) => {
+    setEditingSkillId(id);
+    setEditSkillName(currentName);
+    setError(null);
+  };
+
+  const cancelSkillEdit = () => {
+    setEditingSkillId(null);
+    setEditSkillName("");
+  };
+
+  const saveSkillName = async (skill: SkillChallenge) => {
+    const nextName = editSkillName.trim();
+    if (!nextName || editingSkillSavingId) return;
+    setEditingSkillSavingId(skill.id);
+    setError(null);
+    try {
+      const res = await fetch(`/api/skills/${skill.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: nextName }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to rename challenge");
+      setSkills((cur) => cur.map((s) => (s.id === skill.id ? { ...s, name: nextName } : s)));
+      cancelSkillEdit();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't rename that challenge. Try again.");
+      setSyncState("error");
+    } finally {
+      setEditingSkillSavingId(null);
     }
   };
 
@@ -292,8 +329,51 @@ export default function SkillsPage() {
                       <div className="zen-challenge-icon" aria-hidden="true">
                         <IconTrophy className="w-7 h-7" />
                       </div>
-                      <div className="zen-challenge-title-group">
-                        <h3>{skill.name}</h3>
+                      <div className="zen-challenge-title-group min-w-0">
+                        {editingSkillId === skill.id ? (
+                          <div className="flex items-center gap-2">
+                            <input
+                              autoFocus
+                              value={editSkillName}
+                              onChange={(e) => setEditSkillName(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") saveSkillName(skill);
+                                if (e.key === "Escape") cancelSkillEdit();
+                              }}
+                              className="min-w-0 w-full border border-rule bg-transparent px-2 py-1 text-sm outline-none focus:border-accent"
+                              aria-label="Edit challenge name"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => saveSkillName(skill)}
+                              disabled={!editSkillName.trim() || editingSkillSavingId === skill.id}
+                              className="text-[10px] font-semibold uppercase tracking-wider text-accent disabled:opacity-40"
+                            >
+                              Save
+                            </button>
+                            <button
+                              type="button"
+                              onClick={cancelSkillEdit}
+                              disabled={editingSkillSavingId === skill.id}
+                              className="text-[10px] text-ink-soft"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2 min-w-0">
+                            <h3 className="truncate">{skill.name}</h3>
+                            <button
+                              type="button"
+                              onClick={() => startSkillEdit(skill.id, skill.name)}
+                              disabled={editingSkillSavingId === skill.id}
+                              className="shrink-0 text-ink-soft/60 hover:text-accent transition-colors"
+                              aria-label="Edit challenge name"
+                            >
+                              <IconPencil className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
                         <p>
                           Day {daysElapsed(skill) + 1} of {skill.durationDays} · {daysRemaining(skill)} days left
                         </p>

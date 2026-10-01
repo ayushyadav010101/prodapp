@@ -7,6 +7,7 @@ import { SyncStatus } from "@/components/SyncStatus";
 import {
   IconShare,
   IconTrash,
+  IconPencil,
   IconTasks,
   IconGraduationCap,
   IconBriefcase,
@@ -35,6 +36,9 @@ export default function TasksPage() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editTaskTitle, setEditTaskTitle] = useState("");
+  const [editingTaskSavingId, setEditingTaskSavingId] = useState<string | null>(null);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [categoryName, setCategoryName] = useState("");
   const [savingCategory, setSavingCategory] = useState(false);
@@ -161,6 +165,38 @@ export default function TasksPage() {
         `${listTitle.replace(/\s+/g, "-").toLowerCase()}-tasks.png`,
         `My ${listTitle} task category: ${completed} of ${listTasks.length} tasks completed.`
       );
+    }
+  };
+
+  const startTaskEdit = (taskId: string, currentTitle: string) => {
+    setEditingTaskId(taskId);
+    setEditTaskTitle(currentTitle);
+  };
+
+  const cancelTaskEdit = () => {
+    setEditingTaskId(null);
+    setEditTaskTitle("");
+  };
+
+  const saveTaskTitle = async (taskId: string, taskListId: string) => {
+    const nextTitle = editTaskTitle.trim();
+    if (!nextTitle || editingTaskSavingId) return;
+    setEditingTaskSavingId(taskId);
+    setFormError(null);
+    try {
+      const res = await fetch(`/api/tasks/${taskId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskListId, title: nextTitle }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to rename task");
+      cancelTaskEdit();
+      refresh();
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : "Couldn't rename that task. Try again.");
+    } finally {
+      setEditingTaskSavingId(null);
     }
   };
 
@@ -352,23 +388,68 @@ export default function TasksPage() {
                                 : "border-ink-soft hover:border-ink"
                             } ${pending ? "opacity-40" : ""}`}
                           />
-                          <div className="flex-1">
-                            <p
-                              className={`text-xs md:text-sm ${
-                                task.status === "completed" ? "line-through text-ink-soft" : ""
-                              }`}
-                            >
-                              {task.title || "(Untitled task)"}
-                            </p>
-                            {task.due && (
-                              <p className="text-[10px] md:text-xs text-ink-soft mt-0.5">
-                                Due {new Date(task.due).toLocaleDateString()}
-                              </p>
+                          <div className="flex-1 min-w-0">
+                            {editingTaskId === task.id ? (
+                              <div className="flex items-center gap-2">
+                                <input
+                                  autoFocus
+                                  value={editTaskTitle}
+                                  onChange={(e) => setEditTaskTitle(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") saveTaskTitle(task.id, list.id);
+                                    if (e.key === "Escape") cancelTaskEdit();
+                                  }}
+                                  className="min-w-0 flex-1 border border-rule bg-transparent px-2 py-1 text-xs md:text-sm outline-none focus:border-accent"
+                                  aria-label="Edit task title"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => saveTaskTitle(task.id, list.id)}
+                                  disabled={!editTaskTitle.trim() || editingTaskSavingId === task.id}
+                                  className="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-accent disabled:opacity-40"
+                                >
+                                  Save
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={cancelTaskEdit}
+                                  disabled={editingTaskSavingId === task.id}
+                                  className="text-[10px] md:text-xs text-ink-soft"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex items-start gap-2">
+                                <div className="min-w-0 flex-1">
+                                  <p
+                                    className={`text-xs md:text-sm ${
+                                      task.status === "completed" ? "line-through text-ink-soft" : ""
+                                    }`}
+                                  >
+                                    {task.title || "(Untitled task)"}
+                                  </p>
+                                  {task.due && (
+                                    <p className="text-[10px] md:text-xs text-ink-soft mt-0.5">
+                                      Due {new Date(task.due).toLocaleDateString()}
+                                    </p>
+                                  )}
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => startTaskEdit(task.id, task.title || "")}
+                                  disabled={pending}
+                                  className="text-ink-soft/60 hover:text-accent transition-colors shrink-0 mt-0.5"
+                                  aria-label="Edit task title"
+                                >
+                                  <IconPencil className="w-3.5 h-3.5 md:w-5 md:h-5" />
+                                </button>
+                              </div>
                             )}
                           </div>
                           <button
                             onClick={() => deleteTaskItem(task.id, list.id)}
-                            disabled={pending}
+                            disabled={pending || editingTaskSavingId === task.id}
                             className="text-ink-soft/50 hover:text-red-600 transition-colors shrink-0 mt-0.5"
                             aria-label="Delete task"
                           >

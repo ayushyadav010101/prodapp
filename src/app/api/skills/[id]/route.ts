@@ -13,13 +13,22 @@ export async function PATCH(
   }
 
   const { id } = await params;
-  const { durationDays, startDate, completedDates } = await req.json();
+  const { durationDays, startDate, completedDates, name } = await req.json();
+
+  const hasMetaPatch = durationDays !== undefined && startDate !== undefined && completedDates !== undefined;
+  const hasNamePatch = typeof name === "string" && name.trim().length > 0;
+  if (!hasMetaPatch && !hasNamePatch) {
+    return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
+  }
 
   try {
     const taskListId = await getOrCreateSkillsList(session.accessToken);
-    const task = await patchTask(session.accessToken, taskListId, id, {
-      notes: encodeSkillNotes({ durationDays, startDate, completedDates }),
-    });
+    const taskPatch: { title?: string; notes?: string } = {};
+    if (hasNamePatch) taskPatch.title = name.trim();
+    if (hasMetaPatch) {
+      taskPatch.notes = encodeSkillNotes({ durationDays, startDate, completedDates });
+    }
+    const task = await patchTask(session.accessToken, taskListId, id, taskPatch);
     return NextResponse.json({ ok: true, task });
   } catch (err) {
     if (err instanceof GoogleApiError) {

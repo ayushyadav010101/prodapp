@@ -12,14 +12,21 @@ export async function PATCH(
   }
 
   const { id } = await params;
-  const { taskListId, status } = await req.json();
+  const { taskListId, status, title } = await req.json();
 
-  if (!taskListId || !status) {
-    return NextResponse.json({ error: "Missing taskListId or status" }, { status: 400 });
+  if (!taskListId || (typeof status !== "string" && typeof title !== "string")) {
+    return NextResponse.json({ error: "Missing taskListId or update field" }, { status: 400 });
+  }
+
+  const patch: { status?: "needsAction" | "completed"; title?: string } = {};
+  if (typeof status === "string") patch.status = status as "needsAction" | "completed";
+  if (typeof title === "string" && title.trim()) patch.title = title.trim();
+  if (!patch.status && !patch.title) {
+    return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
   }
 
   try {
-    const updated = await patchTask(session.accessToken, taskListId, id, { status });
+    const updated = await patchTask(session.accessToken, taskListId, id, patch);
     return NextResponse.json({ task: updated });
   } catch (err) {
     if (err instanceof GoogleApiError) {

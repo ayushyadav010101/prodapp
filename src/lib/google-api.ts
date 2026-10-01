@@ -231,6 +231,27 @@ export async function deleteTaskList(
   }
 }
 
+export async function patchEvent(
+  accessToken: string,
+  calendarId: string,
+  eventId: string,
+  patch: Partial<Pick<GoogleEvent, "summary">>
+): Promise<GoogleEvent> {
+  const res = await fetch(
+    `${CALENDAR_BASE}/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(patch),
+    }
+  );
+  if (!res.ok) throw new GoogleApiError(await res.text(), res.status);
+  return res.json();
+}
+
 export async function deleteEvent(
   accessToken: string,
   calendarId: string,

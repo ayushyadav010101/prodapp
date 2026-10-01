@@ -5,7 +5,7 @@ import { useSession, signIn } from "next-auth/react";
 import { useCalendarData } from "@/lib/use-google-data";
 import { SyncStatus } from "@/components/SyncStatus";
 import { MonthCalendarGrid } from "@/components/MonthCalendarGrid";
-import { IconTrash, IconCalendar, IconSun, IconClock } from "@/components/icons";
+import { IconTrash, IconPencil, IconCalendar, IconSun, IconClock } from "@/components/icons";
 import type { GoogleEvent } from "@/lib/google-api";
 import { getEventMeta } from "@/lib/calendarColors";
 
@@ -55,6 +55,9 @@ export default function CalendarPage() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
+  const [editEventTitle, setEditEventTitle] = useState("");
+  const [editingEventSavingId, setEditingEventSavingId] = useState<string | null>(null);
   const [todayKey, setTodayKey] = useState(() => new Date().toDateString());
 
   useEffect(() => {
@@ -217,6 +220,39 @@ export default function CalendarPage() {
       setFormError(err instanceof Error ? err.message : "Failed to create event");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const startEventEdit = (eventId: string, currentTitle: string) => {
+    setEditingEventId(eventId);
+    setEditEventTitle(currentTitle);
+    setFormError(null);
+  };
+
+  const cancelEventEdit = () => {
+    setEditingEventId(null);
+    setEditEventTitle("");
+  };
+
+  const saveEventTitle = async (eventId: string, calendarId?: string) => {
+    const nextTitle = editEventTitle.trim();
+    if (!nextTitle || editingEventSavingId) return;
+    setEditingEventSavingId(eventId);
+    setFormError(null);
+    try {
+      const res = await fetch(`/api/events/${eventId}?calendarId=${encodeURIComponent(calendarId ?? "primary")}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ summary: nextTitle }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to rename event");
+      cancelEventEdit();
+      refresh();
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : "Couldn't rename that event. Try again.");
+    } finally {
+      setEditingEventSavingId(null);
     }
   };
 
@@ -436,13 +472,56 @@ export default function CalendarPage() {
                     }}
                   >
                     <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                      <p
-                        className={`font-semibold text-sm md:text-base truncate ${
-                          expired ? "text-[#76787d] line-through decoration-1" : "text-ink"
-                        }`}
-                      >
-                        {event.summary || "(No title)"}
-                      </p>
+                      {editingEventId === event.id ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            autoFocus
+                            value={editEventTitle}
+                            onChange={(e) => setEditEventTitle(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") saveEventTitle(event.id, event.calendarId);
+                              if (e.key === "Escape") cancelEventEdit();
+                            }}
+                            className="min-w-0 flex-1 border border-rule bg-transparent px-2.5 py-1.5 text-sm md:text-base outline-none focus:border-accent rounded-lg"
+                            aria-label="Edit event title"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => saveEventTitle(event.id, event.calendarId)}
+                            disabled={!editEventTitle.trim() || editingEventSavingId === event.id}
+                            className="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-accent disabled:opacity-40"
+                          >
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            onClick={cancelEventEdit}
+                            disabled={editingEventSavingId === event.id}
+                            className="text-[10px] md:text-xs text-ink-soft"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 min-w-0">
+                          <p
+                            className={`font-semibold text-sm md:text-base truncate ${
+                              expired ? "text-[#76787d] line-through decoration-1" : "text-ink"
+                            }`}
+                          >
+                            {event.summary || "(No title)"}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => startEventEdit(event.id, event.summary || "")}
+                            disabled={deletingId === event.id || editingEventSavingId === event.id}
+                            className="shrink-0 text-ink-soft/55 hover:text-accent transition-colors"
+                            aria-label="Edit event title"
+                          >
+                            <IconPencil className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                          </button>
+                        </div>
+                      )}
                       <div className="flex items-center gap-2 flex-wrap text-xs md:text-sm text-ink-soft">
                         <span
                           className="rounded-lg px-2 py-1 font-medium"
@@ -462,21 +541,23 @@ export default function CalendarPage() {
                       </div>
                     </div>
 
-                    {expired ? (
-                      <div className="flex items-center gap-1.5 text-sm text-[#77797f] shrink-0">
-                        <IconCalendar className="w-4 h-4" />
-                        <span className="hidden sm:inline">Expired</span>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => deleteEventItem(event.id, event.calendarId)}
-                        disabled={deletingId === event.id}
-                        className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-ink-soft/60 hover:text-red-600 hover:bg-paper transition-colors shrink-0"
-                        aria-label="Delete event"
-                      >
-                        <IconTrash className="w-4 h-4" />
-                      </button>
-                    )}
+                    <div className="flex items-center gap-1 shrink-0">
+                      {expired ? (
+                        <div className="flex items-center gap-1.5 text-sm text-[#77797f]">
+                          <IconCalendar className="w-4 h-4" />
+                          <span className="hidden sm:inline">Expired</span>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => deleteEventItem(event.id, event.calendarId)}
+                          disabled={deletingId === event.id || editingEventSavingId === event.id}
+                          className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-ink-soft/60 hover:text-red-600 hover:bg-paper transition-colors"
+                          aria-label="Delete event"
+                        >
+                          <IconTrash className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );

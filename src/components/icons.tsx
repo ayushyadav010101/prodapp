@@ -82,6 +82,15 @@ export function IconTrophy({ className = "" }: { className?: string }) {
   );
 }
 
+export function IconPencil({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className={className}>
+      <path d="M4 20h4l10.6-10.6a2 2 0 0 0-2.8-2.8L5.2 17.2 4 20Z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="m13.7 7.3 3 3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function IconTrash({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className={className}>
