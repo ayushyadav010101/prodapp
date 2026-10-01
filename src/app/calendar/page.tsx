@@ -257,7 +257,7 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-3 py-4 space-y-3 md:px-6 md:py-10 md:space-y-6">
+    <div className="w-full max-w-[1280px] mx-auto px-3 py-4 space-y-3 md:px-8 md:py-10 md:space-y-6">
       <header className="flex items-start justify-between gap-3 flex-wrap border-b border-rule pb-2 md:pb-5">
         <div>
           <p className="text-[9px] md:text-[11px] uppercase tracking-[0.2em] text-accent font-medium mb-0.5 md:mb-1">
@@ -279,7 +279,7 @@ export default function CalendarPage() {
         </div>
       </header>
 
-      <div className="grid grid-cols-3 w-full max-w-xl overflow-hidden rounded-full border border-rule p-0.5 text-[11px] md:text-sm uppercase tracking-widest">
+      <div className="flex w-full max-w-[480px] overflow-hidden rounded-full border border-rule p-0.5 text-[11px] md:text-sm uppercase tracking-widest">
         <button
           type="button"
           onClick={() => {
@@ -287,7 +287,7 @@ export default function CalendarPage() {
             setView("Today");
             setSelectedDate(today);
           }}
-          className={`relative z-10 flex min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
+          className={`relative z-10 flex flex-1 min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
             view === "Today"
               ? "bg-accent text-paper font-semibold"
               : "text-ink-soft hover:text-ink"
@@ -303,7 +303,7 @@ export default function CalendarPage() {
             setView("Week");
             setSelectedDate(null);
           }}
-          className={`relative z-10 flex min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
+          className={`relative z-10 flex flex-1 min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
             view === "Week"
               ? "bg-accent text-paper font-semibold"
               : "text-ink-soft hover:text-ink"
@@ -319,7 +319,7 @@ export default function CalendarPage() {
             setView("Month");
             setSelectedDate(null);
           }}
-          className={`relative z-10 flex min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
+          className={`relative z-10 flex flex-1 min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
             view === "Month"
               ? "bg-accent text-paper font-semibold"
               : "text-ink-soft hover:text-ink"
@@ -390,23 +390,8 @@ export default function CalendarPage() {
         </div>
       )}
 
-      <div className="flex flex-col gap-4 md:gap-6">
-        <div className="order-1">
-          <MonthCalendarGrid
-            events={events}
-            calendars={calendars}
-            selectedDate={selectedDate ?? new Date()}
-            onSelectDate={(d) => {
-              const selected = new Date(d);
-              const today = new Date();
-              const isToday = selected.toDateString() === today.toDateString();
-              setView(isToday ? "Today" : "Month");
-              setSelectedDate(selected);
-            }}
-          />
-        </div>
-
-        <div className="order-2 min-w-0">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_350px] gap-5 lg:gap-7 items-start">
+        <div className="min-w-0 lg:order-1">
           <div className="flex items-center justify-between mb-2 md:mb-3">
             <h2 className="font-serif text-2xl md:text-3xl font-semibold">{rangeLabel}</h2>
             <span className="text-xs md:text-sm text-ink-soft">
@@ -498,6 +483,21 @@ export default function CalendarPage() {
             })}
           </div>
         </div>
+
+        <aside className="min-w-0 lg:order-2 lg:sticky lg:top-6">
+          <MonthCalendarGrid
+            events={events}
+            calendars={calendars}
+            selectedDate={selectedDate ?? new Date()}
+            onSelectDate={(d) => {
+              const selected = new Date(d);
+              const today = new Date();
+              const isToday = selected.toDateString() === today.toDateString();
+              setView(isToday ? "Today" : "Month");
+              setSelectedDate(selected);
+            }}
+          />
+        </aside>
       </div>
     </div>
   );
