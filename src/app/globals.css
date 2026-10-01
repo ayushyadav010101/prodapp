@@ -2748,3 +2748,9 @@ body {
     font-size: 0.6rem !important;
   }
 }
+
+/* Small final alignment tweak: move challenge progress slightly lower
+   without changing card height or the surrounding grid geometry. */
+.zen-challenge-progress-block {
+  transform: translateY(4px);
+}
