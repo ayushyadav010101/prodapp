@@ -2756,29 +2756,26 @@ body {
   }
 }
 
-/* Small final alignment tweak: move challenge progress slightly lower
-   without changing card height or the surrounding grid geometry. */
-.zen-challenge-progress-block {
-  transform: translateY(8px);
-}
-
-/* Align both progress texts with the requested lower visual position. */
-.zen-challenge-progress-meta {
-  transform: translateY(8px) !important;
-}
 
 /* ================================================================
-   ZENSPACE — FINAL PROGRESS POSITION TUNING
-   Keep the current card geometry, but give the progress labels and
-   track a cleaner vertical relationship on desktop + mobile.
+   ZENSPACE — CLEAN PROGRESS POSITION
+   Move the desktop progress section slightly lower as one unit and
+   keep the label, percentage, and track in a clean vertical stack.
+   Mobile uses a smaller offset so the compact card remains balanced.
+   No card height or surrounding geometry changes here.
    ================================================================ */
 @media (min-width: 1101px) {
   .zen-challenge-progress-block {
-    transform: translateY(6px) !important;
+    position: relative !important;
+    top: 14px !important;
+    transform: none !important;
   }
 
   .zen-challenge-progress-meta {
-    margin-bottom: .48rem !important;
+    position: relative !important;
+    transform: none !important;
+    margin-bottom: .58rem !important;
+    line-height: 1.05 !important;
   }
 
   .zen-challenge-progress-track {
@@ -2788,12 +2785,15 @@ body {
 
 @media (max-width: 767px) {
   .zen-challenge-progress-block {
-    margin-top: .45rem !important;
+    position: relative !important;
+    top: 4px !important;
     transform: none !important;
   }
 
   .zen-challenge-progress-meta {
-    margin-bottom: .42rem !important;
+    position: relative !important;
+    transform: none !important;
+    margin-bottom: .52rem !important;
     line-height: 1.1 !important;
   }
 
