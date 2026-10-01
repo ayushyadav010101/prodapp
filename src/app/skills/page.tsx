@@ -12,7 +12,7 @@ import {
   toggleTodayCheckIn,
 } from "@/lib/skills";
 import { SyncStatus } from "@/components/SyncStatus";
-import { IconPencil, IconShare, IconTrash, IconTrophy } from "@/components/icons";
+import { IconPencil, IconShare, IconTrash } from "@/components/icons";
 import { generateShareCard, shareOrDownload } from "@/lib/shareCard";
 import { useLevel } from "@/lib/use-google-data";
 
@@ -158,6 +158,7 @@ export default function SkillsPage() {
       progressPercent: pct,
       footer: "conflict-calendar",
       userName: session?.user?.name ?? undefined,
+      avatarUrl: session?.user?.image ?? undefined,
       level,
     });
     if (blob) {
@@ -286,7 +287,11 @@ export default function SkillsPage() {
                 <div className="zen-challenge-card-top">
                   <div className="zen-challenge-identity">
                     <div className="zen-challenge-icon" aria-hidden="true">
-                      <IconTrophy className="w-6 h-6" />
+                      {session?.user?.image ? (
+                        <img src={session.user.image} alt="" className="h-full w-full object-cover rounded-[inherit]" referrerPolicy="no-referrer" />
+                      ) : (
+                        <span className="text-sm font-semibold" aria-hidden="true">{session?.user?.name?.slice(0, 1)?.toUpperCase() ?? "U"}</span>
+                      )}
                     </div>
                     <div className="zen-challenge-title-group min-w-0">
                       {editingSkillId === skill.id ? (

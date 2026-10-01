@@ -153,6 +153,7 @@ export default function TasksPage() {
       progressPercent: percent,
       footer: "conflict-calendar",
       userName: session?.user?.name ?? undefined,
+      avatarUrl: session?.user?.image ?? undefined,
       level,
       items: listTasks.map((task) => ({
         title: task.title || "(Untitled task)",

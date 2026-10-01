@@ -7,6 +7,7 @@ interface ShareCardOptions {
   progressPercent?: number;
   footer: string;
   userName?: string;
+  avatarUrl?: string;
   level?: number;
   items?: { title: string; completed: boolean }[];
 }
@@ -43,7 +44,27 @@ export async function generateShareCard(opts: ShareCardOptions): Promise<Blob | 
 
     const avatarX = margin + 68;
     const avatarY = y + 82;
-    drawPixelAvatar(ctx, avatarX, avatarY, 102);
+    if (opts.avatarUrl) {
+      try {
+        const avatar = new Image();
+        avatar.crossOrigin = "anonymous";
+        await new Promise<void>((resolve, reject) => {
+          avatar.onload = () => resolve();
+          avatar.onerror = () => reject(new Error("Avatar could not be loaded"));
+          avatar.src = opts.avatarUrl!;
+        });
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(avatarX, avatarY, 51, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(avatar, avatarX - 51, avatarY - 51, 102, 102);
+        ctx.restore();
+      } catch {
+        drawPixelAvatar(ctx, avatarX, avatarY, 102);
+      }
+    } else {
+      drawPixelAvatar(ctx, avatarX, avatarY, 102);
+    }
 
     ctx.textAlign = "left";
     ctx.fillStyle = "#ece7d9";

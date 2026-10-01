@@ -45,8 +45,8 @@ function dateHeading(d: Date) {
 export default function CalendarPage() {
   const { status: sessionStatus } = useSession();
   const { events, calendars, syncState, error, refresh } = useCalendarData();
-  const [view, setView] = useState<"Today" | "Week" | "Month">("Today");
-  const [selectedDate, setSelectedDate] = useState<Date | null>(() => new Date());
+  const [view, setView] = useState<"Today" | "Week" | "Month">("Month");
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
@@ -426,8 +426,8 @@ export default function CalendarPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_350px] gap-5 lg:gap-7 items-start">
-        <div className="min-w-0 lg:order-1">
+      <div className="calendar-layout grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_350px] gap-5 lg:gap-7 items-start">
+        <div className="min-w-0 order-2 lg:order-1">
           <div className="flex items-center justify-between mb-2 md:mb-3">
             <h2 className="font-serif text-2xl md:text-3xl font-semibold">{rangeLabel}</h2>
             <span className="text-xs md:text-sm text-ink-soft">
@@ -461,7 +461,7 @@ export default function CalendarPage() {
                   )}
 
                   <div
-                    className={`list-none flex items-center gap-3 rounded-2xl border overflow-hidden px-4 py-3 md:px-5 md:py-3.5 min-h-[76px] md:min-h-[84px] ${
+                    className={`list-none flex items-center gap-3 rounded-2xl border overflow-hidden px-4 py-2 md:px-5 md:py-2.5 min-h-[62px] md:min-h-[68px] ${
                       expired ? "bg-[#e6e6e8] border-[#d4d4d6]" : "bg-paper-raised border-rule"
                     }`}
                     style={{
@@ -542,21 +542,17 @@ export default function CalendarPage() {
                     </div>
 
                     <div className="flex items-center gap-1 shrink-0">
-                      {expired ? (
-                        <div className="flex items-center gap-1.5 text-sm text-[#77797f]">
-                          <IconCalendar className="w-4 h-4" />
-                          <span className="hidden sm:inline">Expired</span>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => deleteEventItem(event.id, event.calendarId)}
-                          disabled={deletingId === event.id || editingEventSavingId === event.id}
-                          className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-ink-soft/60 hover:text-red-600 hover:bg-paper transition-colors"
-                          aria-label="Delete event"
-                        >
-                          <IconTrash className="w-4 h-4" />
-                        </button>
-                      )}
+                      {expired && <span className="text-xs text-[#77797f] mr-1">Expired</span>}
+                      <button
+                        type="button"
+                        onClick={() => deleteEventItem(event.id, event.calendarId)}
+                        disabled={deletingId === event.id || editingEventSavingId === event.id}
+                        className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-ink-soft/60 hover:text-red-600 hover:bg-paper transition-colors disabled:opacity-40"
+                        aria-label={expired ? "Delete expired event" : "Delete event"}
+                        title={expired ? "Delete expired event" : "Delete event"}
+                      >
+                        <IconTrash className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -565,7 +561,7 @@ export default function CalendarPage() {
           </div>
         </div>
 
-        <aside className="min-w-0 lg:order-2 lg:sticky lg:top-6">
+        <aside className="min-w-0 order-1 lg:order-2 lg:sticky lg:top-6">
           <MonthCalendarGrid
             events={events}
             calendars={calendars}

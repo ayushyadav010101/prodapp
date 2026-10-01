@@ -1795,3 +1795,16 @@ body {
     font-size: .68rem !important;
   }
 }
+
+
+/* Compact challenge cards and keep the calendar overview ahead of events on small screens. */
+@media (max-width: 1023px) {
+  .calendar-layout aside { order: 0; }
+}
+.zen-challenge-card {
+  padding: .78rem .85rem .72rem !important;
+  gap: .62rem !important;
+}
+.zen-challenge-icon { width: 42px !important; height: 42px !important; flex-basis: 42px !important; overflow: hidden; border-radius: 12px !important; }
+.zen-challenge-card-top { gap: .65rem !important; }
+.zen-challenge-card-bottom { gap: .55rem !important; }
