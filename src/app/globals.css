@@ -2198,3 +2198,364 @@ body {
     font-size: .72rem !important;
   }
 }
+
+/* ================================================================
+   ZENSPACE — FINAL 3-CHALLENGE VIEWPORT LAYOUT
+   Keep the first three challenge cards fully visible on the default
+   phone + laptop view without hiding or removing later challenges.
+   Later challenges remain available by scrolling.
+   ================================================================ */
+
+.zen-space-shell {
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.zen-space-header {
+  flex: 0 0 auto;
+  min-height: 0 !important;
+  padding: .35rem 0 .85rem !important;
+  margin-bottom: .9rem !important;
+  gap: .8rem !important;
+}
+
+.zen-space-heading h1 {
+  font-size: clamp(2rem, 3.5vw, 2.8rem) !important;
+  line-height: .98 !important;
+}
+
+.zen-space-subtitle {
+  margin-top: .35rem !important;
+  font-size: .82rem !important;
+  line-height: 1.35 !important;
+}
+
+.zen-space-header-actions {
+  flex: 0 0 auto;
+  align-items: center !important;
+  gap: .55rem !important;
+  white-space: nowrap;
+}
+
+.zen-new-challenge-button {
+  min-height: 40px !important;
+  height: 40px !important;
+  padding: 0 .95rem !important;
+  font-size: .76rem !important;
+  border-radius: 11px !important;
+}
+
+.zen-challenge-list {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: .65rem !important;
+  align-content: start;
+}
+
+.zen-challenge-card {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 134px !important;
+  min-height: 134px !important;
+  max-height: 134px !important;
+  padding: .62rem .72rem .58rem !important;
+  gap: .34rem !important;
+  border: 1px solid var(--rule) !important;
+  border-left: 1px solid var(--rule) !important;
+  border-radius: 15px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.zen-challenge-card-top {
+  flex: 0 0 44px !important;
+  width: 100% !important;
+  min-height: 44px !important;
+  height: 44px !important;
+  align-items: center !important;
+  gap: .7rem !important;
+}
+
+.zen-challenge-identity {
+  min-width: 0 !important;
+  gap: .62rem !important;
+  overflow: hidden;
+}
+
+.zen-challenge-icon {
+  width: 42px !important;
+  height: 42px !important;
+  flex: 0 0 42px !important;
+  border-radius: 11px !important;
+}
+
+.zen-challenge-title-group {
+  min-width: 0 !important;
+  overflow: hidden;
+}
+
+.zen-challenge-title-group h3 {
+  font-size: 1rem !important;
+  line-height: 1.08 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.zen-challenge-title-group p {
+  margin-top: .18rem !important;
+  font-size: .68rem !important;
+  line-height: 1.15 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.zen-challenge-actions {
+  gap: .32rem !important;
+  flex: 0 0 auto !important;
+}
+
+.zen-challenge-icon-button {
+  width: 34px !important;
+  height: 34px !important;
+  flex: 0 0 34px !important;
+  border-radius: 9px !important;
+}
+
+.edit-title-button {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  flex-basis: 34px !important;
+  border-radius: 9px !important;
+}
+
+.edit-title-button svg,
+.zen-challenge-icon-button svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.zen-challenge-progress-block {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+
+.zen-challenge-progress-meta {
+  margin-bottom: .18rem !important;
+  font-size: .62rem !important;
+  line-height: 1 !important;
+}
+
+.zen-challenge-progress-track {
+  height: 6px !important;
+}
+
+.zen-challenge-card-bottom {
+  flex: 1 1 auto !important;
+  min-height: 30px !important;
+  align-items: center !important;
+  margin: 0 !important;
+}
+
+.zen-challenge-streak {
+  gap: .25rem !important;
+  font-size: .68rem !important;
+  white-space: nowrap;
+}
+
+.zen-challenge-flame {
+  font-size: .95rem !important;
+}
+
+.zen-challenge-streak-number {
+  font-size: .78rem !important;
+}
+
+.zen-checkin-button {
+  min-width: 108px !important;
+  width: 108px !important;
+  height: 32px !important;
+  padding: 0 .55rem !important;
+  border-radius: 9px !important;
+  font-size: .68rem !important;
+}
+
+@media (max-width: 1100px) and (min-width: 768px) {
+  .zen-space-shell {
+    padding-inline: .9rem !important;
+  }
+
+  .zen-challenge-card {
+    height: 136px !important;
+    min-height: 136px !important;
+    max-height: 136px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .zen-space-shell {
+    height: calc(100dvh - 64px) !important;
+    max-height: calc(100dvh - 64px) !important;
+    padding: .55rem .72rem .3rem !important;
+  }
+
+  .zen-space-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: .15rem 0 .7rem !important;
+    margin-bottom: .7rem !important;
+    gap: .45rem !important;
+  }
+
+  .zen-space-eyebrow {
+    margin-bottom: .18rem !important;
+    font-size: .6rem !important;
+  }
+
+  .zen-space-heading h1 {
+    font-size: 1.82rem !important;
+  }
+
+  .zen-space-subtitle {
+    margin-top: .25rem !important;
+    max-width: 100% !important;
+    font-size: .7rem !important;
+    line-height: 1.25 !important;
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+    overflow: hidden !important;
+  }
+
+  .zen-space-header-actions {
+    width: 100% !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding-top: 0 !important;
+    gap: .55rem !important;
+  }
+
+  .zen-new-challenge-button {
+    width: auto !important;
+    min-width: 145px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    font-size: .72rem !important;
+    padding-inline: .85rem !important;
+  }
+
+  .zen-challenge-list {
+    gap: .52rem !important;
+  }
+
+  .zen-challenge-card {
+    height: 126px !important;
+    min-height: 126px !important;
+    max-height: 126px !important;
+    padding: .5rem .58rem .48rem !important;
+    gap: .28rem !important;
+    border-radius: 14px !important;
+  }
+
+  .zen-challenge-card-top {
+    flex-basis: 40px !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    gap: .52rem !important;
+  }
+
+  .zen-challenge-icon {
+    width: 38px !important;
+    height: 38px !important;
+    flex-basis: 38px !important;
+    border-radius: 10px !important;
+  }
+
+  .zen-challenge-title-group h3 {
+    font-size: .9rem !important;
+  }
+
+  .zen-challenge-title-group p {
+    font-size: .61rem !important;
+    margin-top: .12rem !important;
+  }
+
+  .zen-challenge-actions {
+    gap: .22rem !important;
+  }
+
+  .zen-challenge-icon-button,
+  .edit-title-button {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    flex-basis: 30px !important;
+    border-radius: 8px !important;
+  }
+
+  .edit-title-button svg,
+  .zen-challenge-icon-button svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .zen-challenge-progress-meta {
+    margin-bottom: .14rem !important;
+    font-size: .58rem !important;
+  }
+
+  .zen-challenge-progress-track {
+    height: 5px !important;
+  }
+
+  .zen-challenge-card-bottom {
+    min-height: 28px !important;
+  }
+
+  .zen-challenge-streak {
+    font-size: .62rem !important;
+  }
+
+  .zen-challenge-streak-number {
+    font-size: .72rem !important;
+  }
+
+  .zen-challenge-flame {
+    font-size: .88rem !important;
+  }
+
+  .zen-checkin-button {
+    min-width: 100px !important;
+    width: 100px !important;
+    height: 30px !important;
+    font-size: .63rem !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .zen-new-challenge-button {
+    min-width: 132px !important;
+  }
+
+  .zen-challenge-card {
+    height: 124px !important;
+    min-height: 124px !important;
+    max-height: 124px !important;
+  }
+
+  .zen-challenge-title-group h3 {
+    font-size: .84rem !important;
+  }
+
+  .zen-challenge-icon-button,
+  .edit-title-button {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    flex-basis: 28px !important;
+  }
+}
