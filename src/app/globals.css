@@ -2890,7 +2890,9 @@ body {
   }
 
   .month-calendar-shell .month-calendar-main > div:nth-child(3) {
-    padding-bottom: 4px;
+    padding-top: 7px;
+    padding-bottom: 0;
+    row-gap: 8px;
   }
 
   .month-calendar-shell .month-calendar-main > div:nth-child(2) > div {
