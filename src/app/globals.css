@@ -2818,7 +2818,8 @@ body {
     grid-template-columns: 82% 18%;
     width: 100%;
     max-width: 100%;
-    min-height: 360px;
+    min-height: 0;
+    height: clamp(290px, 74vw, 306px);
     border-radius: 28px;
   }
 
@@ -2880,14 +2881,25 @@ body {
   }
 
   .month-calendar-shell .month-calendar-main > div:first-child {
-    min-height: 76px;
+    min-height: 0;
+    height: 60px;
   }
 
   .month-calendar-shell .month-calendar-main > div:nth-child(2) {
-    padding-top: 10px;
+    padding-top: 4px;
   }
 
   .month-calendar-shell .month-calendar-main > div:nth-child(3) {
-    padding-bottom: 14px;
+    padding-bottom: 4px;
+  }
+
+  .month-calendar-shell .month-calendar-main > div:nth-child(2) > div {
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 1;
+  }
+
+  .month-calendar-shell .month-calendar-main > div:nth-child(3) > * {
+    height: 32px !important;
   }
 }
