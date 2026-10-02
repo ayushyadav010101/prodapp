@@ -7,6 +7,30 @@ import { computeActiveDates, computeLevel } from "./level";
 
 export type SyncState = "idle" | "syncing" | "error";
 
+/**
+ * Removes duplicate Google Calendar entries that represent the same logical
+ * event (most commonly duplicated holiday calendars), using the same rule the
+ * Calendar page uses for its visible event list.
+ */
+export function dedupeCalendarEvents(events: GoogleEvent[]): GoogleEvent[] {
+  const seen = new Set<string>();
+  return events.filter((event) => {
+    const raw = event.start?.dateTime ?? event.start?.date;
+    if (!raw) return true;
+
+    let startKey = raw;
+    if (event.start?.date && !event.start?.dateTime) {
+      startKey = event.start.date;
+    }
+
+    const key = `${event.summary ?? ""}|${startKey}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+
 export function useCalendarData() {
   const { status: sessionStatus } = useSession();
   const [calendars, setCalendars] = useState<GoogleCalendarListEntry[]>([]);

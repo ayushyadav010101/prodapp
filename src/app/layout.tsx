@@ -23,8 +23,8 @@ export const metadata: Metadata = {
   description: "Calendar, Tasks & Skills, synced with Google",
   manifest: "/manifest.json",
   icons: {
-    icon: "/icon.png",
-    apple: "/icons/apple-touch-icon.png",
+    icon: "/icons/icon-192.png",
+    apple: "/icons/icon-192.png",
   },
 };
 

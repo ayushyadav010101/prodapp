@@ -16,6 +16,7 @@ import {
   useTasksData,
   useSkillsData,
   useLevelFromData,
+  dedupeCalendarEvents,
 } from "@/lib/use-google-data";
 import { eventCheckInKey, localDateKey } from "@/lib/event-checkins";
 
@@ -64,14 +65,19 @@ export default function HomePage() {
     .map((part) => part[0])
     .join("")
     .toUpperCase();
+  const uniqueEvents = useMemo(() => dedupeCalendarEvents(events), [events]);
+
   const todaysEventCount = useMemo(
     () =>
-      events.filter((e) => {
+      uniqueEvents.filter((e) => {
         const raw = e.start?.dateTime ?? e.start?.date;
         if (!raw) return false;
-        return new Date(e.start?.date ? `${e.start.date}T00:00:00` : raw).toDateString() === todayKey;
+        const eventDate = e.start?.date
+          ? new Date(`${e.start.date}T00:00:00`)
+          : new Date(raw);
+        return !Number.isNaN(eventDate.getTime()) && eventDate.toDateString() === todayKey;
       }).length,
-    [events, todayKey]
+    [uniqueEvents, todayKey]
   );
 
   const todaysTasks = useMemo(
@@ -102,7 +108,7 @@ export default function HomePage() {
 
   const todayEventKeys = useMemo(
     () =>
-      events
+      uniqueEvents
         .map((event) => {
           const raw = event.start?.dateTime ?? event.start?.date;
           if (!raw) return null;
@@ -113,7 +119,7 @@ export default function HomePage() {
           return eventCheckInKey(event.id, localDateKey(eventDate));
         })
         .filter((key): key is string => Boolean(key)),
-    [events, todayKey]
+    [uniqueEvents, todayKey]
   );
 
   const completedEventsToday = todayEventKeys.filter((key) => eventCheckInKeys.includes(key)).length;

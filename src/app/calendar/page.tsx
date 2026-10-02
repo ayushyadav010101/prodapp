@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
-import { useCalendarData, useEventCheckInsData } from "@/lib/use-google-data";
+import { useCalendarData, useEventCheckInsData, dedupeCalendarEvents } from "@/lib/use-google-data";
 import { SyncStatus } from "@/components/SyncStatus";
 import { MonthCalendarGrid } from "@/components/MonthCalendarGrid";
 import { IconTrash, IconPencil, IconCalendar, IconSun, IconClock } from "@/components/icons";
@@ -123,14 +123,13 @@ export default function CalendarPage() {
     list.sort((a, b) => a.date.getTime() - b.date.getTime());
 
     // Some Google accounts have the same holiday calendar subscribed more
-    // than once — dedupe by title + exact start time.
-    const seen = new Set<string>();
-    const unique = list.filter(({ event, date }) => {
-      const key = `${event.summary ?? ""}|${date.toISOString()}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+    // than once — use the shared dedupe rule so Calendar and Home always
+    // report the same logical event count.
+    const unique = dedupeCalendarEvents(list.map(({ event }) => event))
+      .map((event) => ({ event, date: getEventDate(event) }))
+      .filter(
+        (x): x is { event: GoogleEvent; date: Date } => x.date !== null
+      );
 
     const isExpired = (event: GoogleEvent, date: Date) => {
       const dateTime = event.start?.dateTime;
