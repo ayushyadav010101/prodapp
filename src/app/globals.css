@@ -2801,3 +2801,93 @@ body {
     transform: none !important;
   }
 }
+
+/* Mobile calendar: move the view controls inside the calendar card and split
+   the card into an ~82/18 two-column layout matching the reference. */
+.month-calendar-mobile-controls {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .calendar-view-switcher {
+    display: none;
+  }
+
+  .month-calendar-shell {
+    display: grid;
+    grid-template-columns: 82% 18%;
+    width: 100%;
+    max-width: 100%;
+    min-height: 360px;
+    border-radius: 28px;
+  }
+
+  .month-calendar-main {
+    min-width: 0;
+  }
+
+  .month-calendar-mobile-controls {
+    position: relative;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    border-left: 1px solid var(--rule);
+    min-width: 0;
+  }
+
+  .month-calendar-mobile-controls::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: var(--rule);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .month-calendar-mobile-control {
+    width: 86%;
+    justify-self: center;
+    align-self: center;
+    min-height: 112px;
+    padding: 14px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border: 0;
+    border-radius: 22px;
+    color: var(--ink-soft);
+    background: transparent;
+    font-size: .82rem;
+    font-weight: 500;
+    letter-spacing: .02em;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background-color .18s ease, color .18s ease, transform .18s ease;
+  }
+
+  .month-calendar-mobile-control.is-active {
+    background: var(--accent);
+    color: var(--paper);
+    font-weight: 700;
+  }
+
+  .month-calendar-mobile-control:active {
+    transform: scale(.98);
+  }
+
+  .month-calendar-shell .month-calendar-main > div:first-child {
+    min-height: 76px;
+  }
+
+  .month-calendar-shell .month-calendar-main > div:nth-child(2) {
+    padding-top: 10px;
+  }
+
+  .month-calendar-shell .month-calendar-main > div:nth-child(3) {
+    padding-bottom: 14px;
+  }
+}

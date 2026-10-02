@@ -64,6 +64,19 @@ export default function CalendarPage() {
   const [todayKey, setTodayKey] = useState(() => new Date().toDateString());
 
   useEffect(() => {
+    const handleResponsiveView = () => {
+      if (window.innerWidth < 768 && view === "Week") {
+        setView("Month");
+        setSelectedDate(null);
+      }
+    };
+
+    handleResponsiveView();
+    window.addEventListener("resize", handleResponsiveView);
+    return () => window.removeEventListener("resize", handleResponsiveView);
+  }, [view]);
+
+  useEffect(() => {
     const updateToday = () => {
       const nextToday = new Date();
       const nextTodayKey = nextToday.toDateString();
@@ -344,7 +357,7 @@ export default function CalendarPage() {
         </div>
       </header>
 
-      <div className="flex w-full max-w-[480px] overflow-hidden rounded-full border border-rule p-0.5 text-[11px] md:text-sm uppercase tracking-widest">
+      <div className="calendar-view-switcher flex w-full max-w-[480px] overflow-hidden rounded-full border border-rule p-0.5 text-[11px] md:text-sm uppercase tracking-widest">
         <button
           type="button"
           onClick={() => {
@@ -608,6 +621,17 @@ export default function CalendarPage() {
             events={events}
             calendars={calendars}
             selectedDate={selectedDate ?? new Date()}
+            view={view}
+            onChangeView={(nextView) => {
+              if (nextView === "Today") {
+                const today = new Date();
+                setView("Today");
+                setSelectedDate(today);
+              } else {
+                setView("Month");
+                setSelectedDate(null);
+              }
+            }}
             onSelectDate={(d) => {
               const selected = new Date(d);
               const today = new Date();
