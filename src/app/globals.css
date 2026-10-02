@@ -2888,6 +2888,7 @@ body {
   .month-calendar-shell .month-calendar-main > div:first-child {
     min-height: 0;
     height: 46px;
+    border-bottom: 0 !important;
   }
 
   .month-calendar-shell .month-calendar-main > div:nth-child(2) {
