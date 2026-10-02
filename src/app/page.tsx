@@ -8,6 +8,7 @@ import {
   IconCalendar,
   IconTasks,
   IconTrophy,
+  IconSettings,
 } from "@/components/icons";
 import {
   useCalendarData,
@@ -140,8 +141,16 @@ export default function HomePage() {
   return (
     <div className="max-w-6xl mx-auto px-3 sm:px-5 md:px-6 py-3 sm:py-5 md:py-5 pb-20 md:pb-5">
       <div className={`grid gap-3 md:gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(290px,0.8fr)] transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
-        <section aria-label="Your profile and progress" className="rounded-2xl sm:rounded-[1.9rem] border border-rule bg-paper-raised p-4 sm:p-5 md:p-6 md:min-h-[300px] flex flex-col justify-between">
-          <div className="flex items-start gap-3 sm:gap-5 min-w-0">
+        <section aria-label="Your profile and progress" className="relative rounded-2xl sm:rounded-[1.9rem] border border-rule bg-paper-raised p-4 sm:p-5 md:p-6 md:min-h-[300px] flex flex-col justify-between">
+          <Link
+            href="/settings"
+            aria-label="Open Settings"
+            title="Settings"
+            className="group absolute right-3 top-3 sm:right-4 sm:top-4 md:right-5 md:top-5 inline-flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl border border-rule bg-paper-raised text-ink-soft transition-colors hover:border-ink hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+          >
+            <IconSettings className="h-5 w-5 sm:h-5 sm:w-5" />
+          </Link>
+          <div className="flex items-start gap-3 sm:gap-5 min-w-0 pr-12 sm:pr-14 md:pr-16">
             <div className="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl sm:rounded-[1.2rem] bg-[#efe6cf] border border-rule shadow-sm overflow-hidden flex items-center justify-center shrink-0">
               {avatarUrl ? (
                 <img
