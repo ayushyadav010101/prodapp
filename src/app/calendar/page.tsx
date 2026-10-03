@@ -133,8 +133,6 @@ export default function CalendarPage() {
         );
     }
 
-    list.sort((a, b) => a.date.getTime() - b.date.getTime());
-
     // Some Google accounts have the same holiday calendar subscribed more
     // than once — use the shared dedupe rule so Calendar and Home always
     // report the same logical event count.
@@ -142,7 +140,8 @@ export default function CalendarPage() {
       .map((event) => ({ event, date: getEventDate(event) }))
       .filter(
         (x): x is { event: GoogleEvent; date: Date } => x.date !== null
-      );
+      )
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
 
     const isExpired = (event: GoogleEvent, date: Date) => {
       const dateTime = event.start?.dateTime;
@@ -152,18 +151,23 @@ export default function CalendarPage() {
       return date.getTime() < todayStart.getTime();
     };
 
-    // Keep the latest two expired events as context at the top, then show
-    // the remaining events in chronological order.
+    // Show at most two expired events, keeping the TWO MOST RECENT
+    // expired events and hiding anything older. The final visible list is
+    // sorted chronologically, so the older of the two kept events appears
+    // first, followed by the newer one.
     const expired = unique
       .filter(({ event, date }) => isExpired(event, date))
       .sort((a, b) => b.date.getTime() - a.date.getTime())
       .slice(0, 2);
-    const expiredKeys = new Set(expired.map(({ event, date }) => `${event.id}|${date.toDateString()}`));
-    const upcoming = unique
-      .filter(({ event, date }) => !expiredKeys.has(`${event.id}|${date.toDateString()}`))
-      .sort((a, b) => a.date.getTime() - b.date.getTime());
+    const expiredKeys = new Set(
+      expired.map(({ event, date }) => `${event.id}|${date.toDateString()}`)
+    );
+    const visible = unique.filter(
+      ({ event, date }) =>
+        !isExpired(event, date) || expiredKeys.has(`${event.id}|${date.toDateString()}`)
+    );
 
-    return [...expired.sort((a, b) => a.date.getTime() - b.date.getTime()), ...upcoming];
+    return visible.sort((a, b) => a.date.getTime() - b.date.getTime());
   }, [events, view, selectedDate, todayKey]);
 
   const rangeLabel = selectedDate
