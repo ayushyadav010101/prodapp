@@ -32,7 +32,7 @@ export default function HomePage() {
   const { data: session, status } = useSession();
   const { events, error: calError, refresh: refreshEvents } = useCalendarData();
   const { checkedInKeys: eventCheckInKeys } = useEventCheckInsData();
-  const { tasks, todayTaskIds, error: taskError, refresh: refreshTasks } = useTasksData();
+  const { tasks, taskLists, error: taskError, refresh: refreshTasks } = useTasksData();
   const { skills } = useSkillsData();
   const [mounted, setMounted] = useState(false);
   const [now, setNow] = useState(() => new Date());
@@ -80,9 +80,13 @@ export default function HomePage() {
     [uniqueEvents, todayKey]
   );
 
+  // My Tasks is the first visible Google Task list in this app.
+  // Every task currently in that list contributes to today's workload,
+  // regardless of whether the Google Task has a due date.
+  const myTasksListId = taskLists[0]?.id;
   const todaysTasks = useMemo(
-    () => tasks.filter((task) => todayTaskIds.includes(task.id)),
-    [tasks, todayTaskIds]
+    () => (myTasksListId ? tasks.filter((task) => task.taskListId === myTasksListId) : []),
+    [tasks, myTasksListId]
   );
 
   const todayChallenges = useMemo(
@@ -101,8 +105,7 @@ export default function HomePage() {
     [skills, todayKey]
   );
 
-  // The Home card now represents today's workload rather than every task in
-  // every Google Task list.
+  // The Home card treats the entire My Tasks list as today's workload.
   const todayTaskCount = todaysTasks.length;
   const challengeCount = todayChallenges.length;
 
