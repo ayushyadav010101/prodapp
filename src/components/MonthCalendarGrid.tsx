@@ -70,7 +70,7 @@ export function MonthCalendarGrid({
   const isSameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
 
   return (
-    <div className="month-calendar-shell rounded-2xl border border-rule bg-paper-raised overflow-hidden w-full lg:min-w-[340px] lg:max-w-[350px] lg:ml-auto">
+    <div className="month-calendar-shell rounded-2xl border border-rule bg-paper-raised overflow-hidden w-full lg:min-w-0 lg:max-w-none lg:ml-0">
       <div className="month-calendar-main min-w-0">
         <div className="flex items-center justify-between px-3 py-2 border-b border-rule lg:px-4 lg:py-3">
           <button

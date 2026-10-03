@@ -361,58 +361,6 @@ export default function CalendarPage() {
         </div>
       </header>
 
-      <div className="calendar-view-switcher flex w-full max-w-[480px] overflow-hidden rounded-full border border-rule p-0.5 text-[11px] md:text-sm uppercase tracking-widest">
-        <button
-          type="button"
-          onClick={() => {
-            const today = new Date();
-            setView("Today");
-            setSelectedDate(today);
-          }}
-          className={`relative z-10 flex flex-1 min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
-            view === "Today"
-              ? "bg-accent text-paper font-semibold"
-              : "text-ink-soft hover:text-ink"
-          }`}
-          aria-pressed={view === "Today"}
-        >
-          <IconSun className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
-          <span className="truncate">Today</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setView("Week");
-            setSelectedDate(null);
-          }}
-          className={`relative z-10 flex flex-1 min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
-            view === "Week"
-              ? "bg-accent text-paper font-semibold"
-              : "text-ink-soft hover:text-ink"
-          }`}
-          aria-pressed={view === "Week"}
-        >
-          <IconCalendar className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
-          <span className="truncate">Week</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setView("Month");
-            setSelectedDate(null);
-          }}
-          className={`relative z-10 flex flex-1 min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
-            view === "Month"
-              ? "bg-accent text-paper font-semibold"
-              : "text-ink-soft hover:text-ink"
-          }`}
-          aria-pressed={view === "Month"}
-        >
-          <IconCalendar className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
-          <span className="truncate">Month</span>
-        </button>
-      </div>
-
       {showForm && (
         <div className="border border-rule rounded-2xl p-5 space-y-3 bg-paper-raised">
           {formError && <p className="text-sm text-red-700 dark:text-red-400">{formError}</p>}
@@ -472,7 +420,7 @@ export default function CalendarPage() {
         </div>
       )}
 
-      <div className="calendar-layout grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_350px] gap-5 lg:gap-7 items-start">
+      <div className="calendar-layout grid grid-cols-1 lg:grid-cols-[minmax(0,65fr)_minmax(0,35fr)] gap-5 lg:gap-6 items-start">
         <div className="min-w-0 order-2 lg:order-1">
           <div className="flex items-center justify-between mb-2 md:mb-3">
             <h2 className="font-serif text-2xl md:text-3xl font-semibold">{rangeLabel}</h2>
@@ -620,8 +568,61 @@ export default function CalendarPage() {
           </div>
         </div>
 
-        <aside className="min-w-0 order-1 lg:order-2 lg:sticky lg:top-6">
-          <MonthCalendarGrid
+        <aside className="min-w-0 order-1 lg:order-2 lg:sticky lg:top-6 lg:border-l lg:border-rule lg:pl-6">
+          <div className="calendar-right-column space-y-3 md:space-y-4">
+            <div className="calendar-view-switcher flex w-full max-w-none overflow-hidden rounded-full border border-rule p-0.5 text-[11px] md:text-sm uppercase tracking-widest">
+              <button
+                type="button"
+                onClick={() => {
+                  const today = new Date();
+                  setView("Today");
+                  setSelectedDate(today);
+                }}
+                className={`relative z-10 flex flex-1 min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
+                  view === "Today"
+                    ? "bg-accent text-paper font-semibold"
+                    : "text-ink-soft hover:text-ink"
+                }`}
+                aria-pressed={view === "Today"}
+              >
+                <IconSun className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+                <span className="truncate">Today</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setView("Week");
+                  setSelectedDate(null);
+                }}
+                className={`relative z-10 flex flex-1 min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
+                  view === "Week"
+                    ? "bg-accent text-paper font-semibold"
+                    : "text-ink-soft hover:text-ink"
+                }`}
+                aria-pressed={view === "Week"}
+              >
+                <IconCalendar className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+                <span className="truncate">Week</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setView("Month");
+                  setSelectedDate(null);
+                }}
+                className={`relative z-10 flex flex-1 min-w-0 cursor-pointer pointer-events-auto items-center justify-center gap-1.5 md:gap-2 rounded-full h-10 md:h-11 px-3 md:px-4 touch-manipulation transition-colors ${
+                  view === "Month"
+                    ? "bg-accent text-paper font-semibold"
+                    : "text-ink-soft hover:text-ink"
+                }`}
+                aria-pressed={view === "Month"}
+              >
+                <IconCalendar className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+                <span className="truncate">Month</span>
+              </button>
+            </div>
+
+            <MonthCalendarGrid
             events={events}
             calendars={calendars}
             selectedDate={selectedDate ?? new Date()}
@@ -644,6 +645,7 @@ export default function CalendarPage() {
               setSelectedDate(selected);
             }}
           />
+          </div>
         </aside>
       </div>
     </div>

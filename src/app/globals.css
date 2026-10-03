@@ -2917,3 +2917,31 @@ body {
     min-height: 0;
   }
 }
+
+/* Final desktop calendar composition: events left, controls + mini calendar right. */
+@media (min-width: 1024px) {
+  .calendar-layout {
+    align-items: start;
+  }
+
+  .calendar-layout > aside {
+    min-width: 0;
+  }
+
+  .calendar-view-switcher {
+    width: 100%;
+    max-width: none;
+  }
+
+  .calendar-right-column {
+    width: 100%;
+  }
+}
+
+/* The right-side control panel collapses naturally with the stacked tablet/mobile layout. */
+@media (max-width: 1023px) {
+  .calendar-layout > aside {
+    border-left: 0 !important;
+    padding-left: 0 !important;
+  }
+}
