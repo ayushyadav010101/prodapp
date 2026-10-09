@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useSession, signIn } from "next-auth/react";
-import { useCalendarData } from "@/lib/use-google-data";
-import type { GoogleEvent } from "@/lib/google-api";
 import { IconCalendar, IconCheck, IconChevronLeft, IconChevronRight, IconDailyLog, IconProfile } from "@/components/icons";
 import { DAILY_FLOW_ICONS, DEFAULT_DAILY_FLOWS, emptyDailyEntry, type DailyFlowIcon, type DailyLogEntry, type DailyLogFlow } from "@/lib/daily-log";
 import styles from "./DailyLog.module.css";
@@ -26,7 +24,6 @@ function FlowIcon({ icon, className = "" }: FlowIconProps) {
 function dateKey(date: Date) { return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; }
 function parseDate(key: string) { const [y, m, d] = key.split("-").map(Number); return new Date(y, m - 1, d, 12); }
 function formatDate(date: Date, options: Intl.DateTimeFormatOptions = { weekday: "long", day: "numeric", month: "long", year: "numeric" }) { return date.toLocaleDateString(undefined, options); }
-function eventKey(event: GoogleEvent): string | null { if (event.start?.date) return event.start.date; if (event.start?.dateTime) return dateKey(new Date(event.start.dateTime)); return null; }
 function entryPreview(entry: DailyLogEntry, flows: DailyLogFlow[]) {
   const notes = Object.values(entry.notes).map((note) => note.trim()).filter(Boolean);
   if (notes.length) return notes.join(", ").replace(/\s+/g, " ");
@@ -34,29 +31,9 @@ function entryPreview(entry: DailyLogEntry, flows: DailyLogFlow[]) {
   return completeNames.length ? `${completeNames.join(", ")} completed` : "Daily entry saved";
 }
 
-function MiniCalendar({ selectedDate, events, entries, onSelectDate }: { selectedDate: Date; events: GoogleEvent[]; entries: DailyLogEntry[]; onSelectDate: (date: Date) => void }) {
-  const [cursor, setCursor] = useState(() => new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
-  useEffect(() => { setCursor((old) => old.getFullYear() === selectedDate.getFullYear() && old.getMonth() === selectedDate.getMonth() ? old : new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1)); }, [selectedDate]);
-  const year = cursor.getFullYear(); const month = cursor.getMonth(); const firstDay = new Date(year, month, 1).getDay(); const dayCount = new Date(year, month + 1, 0).getDate();
-  const cellCount = Math.ceil((firstDay + dayCount) / 7) * 7;
-  const cells: Date[] = Array.from({ length: cellCount }, (_, index) => new Date(year, month, index - firstDay + 1));
-  const eventDates = new Set(events.map(eventKey).filter((key): key is string => Boolean(key)));
-  const entryDates = new Set(entries.map((entry) => entry.date)); const todayKey = dateKey(new Date());
-  return <section className={styles.sideCard} aria-label="Calendar">
-    <div className={styles.sideCardHeader}><h2>Calendar</h2><Link href="/calendar" className={styles.orangeLink}>View All</Link></div>
-    <div className={styles.miniMonthHeader}><button type="button" aria-label="Previous month" onClick={() => setCursor(new Date(year, month - 1, 1))}><IconChevronLeft className={styles.tinyIcon} /></button><strong>{cursor.toLocaleDateString(undefined, { month: "long", year: "numeric" })}</strong><button type="button" aria-label="Next month" onClick={() => setCursor(new Date(year, month + 1, 1))}><IconChevronRight className={styles.tinyIcon} /></button></div>
-    <div className={styles.miniWeekdays}>{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => <span key={day}>{day}</span>)}</div>
-    <div className={styles.miniDays}>{cells.map((date) => {
-      const key = dateKey(date); const selected = key === dateKey(selectedDate); const today = key === todayKey; const marker = entryDates.has(key) || eventDates.has(key); const otherMonth = date.getMonth() !== month;
-      return <button key={key} type="button" aria-label={formatDate(date)} aria-pressed={selected} onClick={() => onSelectDate(date)} className={`${styles.miniDay} ${otherMonth ? styles.miniDayMuted : ""} ${selected ? styles.miniDaySelected : ""} ${today && !selected ? styles.miniDayToday : ""}`}><span>{date.getDate()}</span>{marker && <i className={entryDates.has(key) ? styles.entryDot : styles.eventDot} />}</button>;
-    })}</div>
-  </section>;
-}
-
 export default function DailyLogPage() {
   const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
-  const { events } = useCalendarData();
   const datePickerRef = useRef<HTMLInputElement>(null);
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [dateReady, setDateReady] = useState(false);
@@ -235,7 +212,6 @@ export default function DailyLogPage() {
       </div>
 
       <aside className={styles.rightSidebar}>
-        <MiniCalendar selectedDate={selectedDate} events={events} entries={entries} onSelectDate={(date) => void changeDate(date)} />
         <section className={styles.sideCard}>
           <div className={styles.sideCardHeader}><h2>Today&apos;s Progress</h2><span>{completedCount} / {activeFlows.length} completed</span></div>
           <div className={styles.progressList}>{activeFlows.map((flow) => { const done = completed.has(flow.id); return <button type="button" key={flow.id} className={styles.progressItem} onClick={() => document.getElementById(`flow-${flow.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" })}><span className={styles.progressIcon} style={{ color: flow.color, backgroundColor: `${flow.color}20` }}><FlowIcon icon={flow.icon} /></span><span className={styles.progressName}>{flow.name}</span><span className={`${styles.progressCheckbox} ${done ? styles.progressCheckboxDone : ""}`}>{done && <IconCheck className={styles.checkIcon} />}</span><span className={styles.progressArrow}>›</span></button>; })}</div>

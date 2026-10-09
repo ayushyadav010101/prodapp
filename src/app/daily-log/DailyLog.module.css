@@ -35,7 +35,7 @@
 .errorNotice { color:#d84a43; border:1px solid #d84a4350; background:#d84a4310; }
 .errorNotice button { text-decoration:underline; font-weight:700; }
 .notice { color:var(--ink-soft); border:1px solid var(--rule); background:var(--paper-raised); }
-.dashboardGrid { display:grid; grid-template-columns:minmax(0,1fr) 312px; align-items:start; gap:16px; }
+.dashboardGrid { display:grid; grid-template-columns:minmax(0,1fr) minmax(292px, 312px); align-items:start; gap:16px; }
 .mainColumn { min-width:0; }
 .introCard { min-height:122px; display:flex; align-items:center; gap:18px; padding:16px 20px; margin-bottom:12px; border:1px solid var(--rule); border-radius:15px; background:var(--paper-raised); }
 .avatar { flex:0 0 84px; width:84px; height:84px; overflow:hidden; display:flex; align-items:center; justify-content:center; border-radius:12px; border:1px solid var(--rule); background:color-mix(in srgb, var(--accent) 15%, var(--paper-raised)); font-family:var(--font-source-serif), Georgia, serif; font-size:25px; font-weight:700; }
@@ -48,13 +48,13 @@
 .addFlowButton span, .addNewFlow span { font-size:24px; line-height:1; }
 .addFlowButton:hover { filter:brightness(1.06); }
 .flowSection { padding:8px 10px 12px; border:1px solid var(--rule); border-radius:14px; background:var(--paper-raised); min-width:0; }
-.flowGrid { display:grid; grid-template-columns:28px minmax(100px,1.25fr) minmax(135px,.95fr) 58px minmax(160px,1.35fr) 28px; column-gap:10px; align-items:center; }
+.flowGrid { display:grid; grid-template-columns:minmax(26px,4fr) minmax(95px,15fr) minmax(170px,36fr) minmax(44px,8fr) minmax(165px,34fr) minmax(24px,3fr); column-gap:8px; align-items:center; }
 .tableHeader { min-height:36px; padding:0 6px 6px; border-bottom:1px solid color-mix(in srgb, var(--rule) 70%, transparent); color:var(--accent); font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; }
 .tableHeader > span:nth-child(2) { padding-left:3px; }
 .planHeading { padding-left:2px; }
 .centerHeading { text-align:center; }
-.flowRow { position:relative; min-height:72px; padding:7px 6px; margin-top:2px; border:1px solid transparent; border-radius:10px; background:color-mix(in srgb, var(--paper-raised) 88%, var(--paper) 12%); }
-.flowRowTall { min-height:94px; }
+.flowRow { position:relative; min-height:80px; padding:7px 6px; margin-top:2px; border:1px solid transparent; border-radius:10px; background:color-mix(in srgb, var(--paper-raised) 88%, var(--paper) 12%); }
+.flowRowTall { min-height:98px; }
 .flowRow:hover { border-color:color-mix(in srgb, var(--rule) 88%, transparent); }
 .dragCell { display:flex; justify-content:center; align-items:center; }
 .dragHandle { color:var(--ink-soft); cursor:grab; font-size:19px; line-height:1; padding:5px 0; touch-action:none; }
@@ -92,22 +92,6 @@
 .sideCardHeader > span { color:var(--ink-soft); white-space:nowrap; font-size:11px; }
 .orangeLink { color:var(--accent); font-size:12px; font-weight:650; white-space:nowrap; }
 .orangeLink:hover { text-decoration:underline; }
-.miniMonthHeader { display:flex; align-items:center; justify-content:space-between; height:31px; margin-bottom:3px; }
-.miniMonthHeader button { display:flex; align-items:center; justify-content:center; width:25px; height:25px; border-radius:50%; color:var(--ink-soft); }
-.miniMonthHeader button:hover { border:1px solid var(--rule); color:var(--accent); }
-.miniMonthHeader svg { width:14px; height:14px; }
-.miniMonthHeader strong { font-family:var(--font-source-serif), Georgia, serif; font-size:14px; font-weight:650; }
-.miniWeekdays, .miniDays { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:2px; text-align:center; }
-.miniWeekdays { margin:4px 0 4px; color:var(--ink-soft); font-size:10px; }
-.miniDays { grid-auto-rows:29px; }
-.miniDay { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; min-width:0; height:28px; border-radius:7px; color:var(--ink); font-size:11px; line-height:1; }
-.miniDay:hover { background:color-mix(in srgb, var(--accent) 12%, transparent); }
-.miniDaySelected { background:var(--accent); color:#23170f; font-weight:800; }
-.miniDayToday:not(.miniDaySelected) { color:var(--accent); font-weight:800; }
-.miniDay i { display:block; width:4px; height:4px; border-radius:50%; background:var(--accent); position:absolute; bottom:2px; }
-.miniDay .eventDot { background:var(--accent); }
-.miniDay .entryDot { background:#d8a046; }
-.miniDaySelected i { background:#23170f; }
 .progressList { display:flex; flex-direction:column; gap:2px; }
 .progressItem { display:grid; grid-template-columns:27px minmax(0,1fr) 20px 12px; align-items:center; gap:8px; width:100%; min-height:34px; text-align:left; border-radius:7px; }
 .progressItem:hover { background:color-mix(in srgb, var(--accent) 7%, transparent); }
@@ -144,16 +128,13 @@
 
 @media (max-width: 1220px) {
   .dashboardGrid { grid-template-columns:minmax(0,1fr); }
-  .rightSidebar { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); align-items:start; }
-  .miniDays { grid-auto-rows:25px; }
-  .miniDay { height:24px; }
+  .rightSidebar { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
 }
 @media (max-width: 1000px) {
   .page { padding:12px 12px 25px; }
   .pageHeader { flex-direction:column; gap:12px; }
   .headerActions { justify-content:flex-start; padding-top:0; }
   .rightSidebar { grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .rightSidebar > :first-child { grid-row:span 2; }
   .flowGrid { grid-template-columns:24px minmax(90px,1fr) minmax(120px,1fr) 48px minmax(140px,1.2fr) 24px; column-gap:7px; }
 }
 @media (max-width: 760px) {
@@ -197,8 +178,6 @@
   .addNewFlow { min-height:52px; margin-top:9px; }
   .rightSidebar { display:flex; flex-direction:column; }
   .sideCard { padding:11px; }
-  .miniDays { grid-auto-rows:30px; }
-  .miniDay { height:28px; }
   .progressList { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:3px 7px; }
   .progressItem { grid-template-columns:24px minmax(0,1fr) 17px; gap:5px; }
   .progressArrow { display:none; }
@@ -247,5 +226,4 @@
 .avatarFallback { width:42px; height:42px; }
 .recentDocIcon { width:19px; height:19px; flex:0 0 auto; }
 .recentChevron { width:13px; height:13px; flex:0 0 auto; }
-.miniDayMuted { color:color-mix(in srgb, var(--ink-soft) 55%, transparent); }
 .recentEntry { appearance:none; width:100%; border:0; background:transparent; text-align:left; color:inherit; cursor:pointer; font:inherit; }
