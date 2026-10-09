@@ -23,13 +23,24 @@ export function daysRemaining(skill: SkillChallenge): number {
   return Math.max(0, skill.durationDays - daysElapsed(skill));
 }
 
-// Progress reflects how many days you've actually completed out of the
-// total challenge length — not how much calendar time has simply passed.
-// Returned to 2 decimal places so small challenges show meaningful detail
-// (e.g. 2.55%) instead of rounding away to 0% or 3%.
+// Progress = unique check-in days / total challenge days * 100.
+// Count unique dates so legacy duplicate entries cannot inflate progress.
+// Keep the percentage bounded and stable at two decimal places.
 export function progressPercent(skill: SkillChallenge): number {
-  const raw = (skill.completedDates.length / skill.durationDays) * 100;
-  return Math.min(100, Math.round(raw * 100) / 100);
+  const totalDays = Number.isFinite(skill.durationDays)
+    ? Math.floor(skill.durationDays)
+    : 0;
+  if (totalDays <= 0) return 0;
+
+  const completedCheckInDays = new Set(
+    (Array.isArray(skill.completedDates) ? skill.completedDates : []).filter(
+      (date): date is string =>
+        typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date),
+    ),
+  ).size;
+
+  const raw = (completedCheckInDays / totalDays) * 100;
+  return Math.min(100, Math.max(0, Math.round(raw * 100) / 100));
 }
 
 // Current streak = consecutive days (ending today or yesterday) checked in.
