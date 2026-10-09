@@ -2945,3 +2945,215 @@ body {
     padding-left: 0 !important;
   }
 }
+
+
+/* ZenSpace metrics row: all cards share the same metric order and styling. */
+.zen-challenge-card {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: .18rem !important;
+}
+
+.zen-challenge-card-top {
+  flex: 0 0 54px !important;
+  min-height: 54px !important;
+  height: 54px !important;
+}
+
+.zen-challenge-metrics {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: .55rem;
+  width: calc(100% - 65px);
+  margin-left: 65px;
+  min-width: 0;
+  min-height: 28px;
+  flex: 0 0 auto;
+}
+
+.zen-challenge-metric {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: .42rem;
+  min-width: 0;
+  padding: .32rem .65rem;
+  border: 1px solid color-mix(in srgb, var(--rule) 88%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--paper-raised) 40%, transparent);
+  color: var(--ink);
+  font-size: .82rem;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.zen-challenge-metric strong {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.zen-challenge-metric-icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+}
+
+/* Keep the original card footprint; the metrics occupy a compact second row. */
+.zen-challenge-progress-block {
+  position: static !important;
+  top: auto !important;
+  transform: none !important;
+  min-height: 0;
+  margin: 0 !important;
+  flex: 1 1 auto !important;
+  justify-content: center !important;
+}
+
+.zen-challenge-card-bottom {
+  flex: 0 0 30px !important;
+  min-height: 30px !important;
+  margin-top: 0 !important;
+}
+
+@media (min-width: 1101px) {
+  .zen-challenge-card {
+    height: 173px !important;
+    min-height: 173px !important;
+    max-height: 173px !important;
+    padding: .55rem .8rem .5rem !important;
+    gap: .18rem !important;
+  }
+
+  .zen-challenge-card-top {
+    flex-basis: 54px !important;
+    min-height: 54px !important;
+    height: 54px !important;
+  }
+
+  .zen-challenge-metrics {
+    min-height: 28px;
+    gap: .55rem;
+  }
+
+  .zen-challenge-metric {
+    padding: .32rem .65rem;
+    font-size: .82rem;
+  }
+
+  .zen-challenge-progress-meta {
+    margin-bottom: .3rem !important;
+    line-height: 1.05 !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1100px) {
+  .zen-challenge-card {
+    height: 136px !important;
+    min-height: 136px !important;
+    max-height: 136px !important;
+    padding: .42rem .65rem .35rem !important;
+    gap: .04rem !important;
+  }
+
+  .zen-challenge-card-top {
+    flex-basis: 42px !important;
+    min-height: 42px !important;
+    height: 42px !important;
+  }
+
+  .zen-challenge-metrics {
+    width: calc(100% - 52px);
+    margin-left: 52px;
+    min-height: 22px;
+    gap: .18rem;
+  }
+
+  .zen-challenge-metric {
+    gap: .2rem;
+    padding: .18rem .32rem;
+    font-size: .64rem;
+  }
+
+  .zen-challenge-metric-icon {
+    width: 13px;
+    height: 13px;
+    flex-basis: 13px;
+  }
+
+  .zen-challenge-card-bottom {
+    flex-basis: 30px !important;
+    min-height: 30px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .zen-challenge-card {
+    height: 158px !important;
+    min-height: 158px !important;
+    max-height: 158px !important;
+    padding: .5rem .58rem .42rem !important;
+    gap: .13rem !important;
+  }
+
+  .zen-challenge-card-top {
+    flex-basis: 40px !important;
+    min-height: 40px !important;
+    height: 40px !important;
+  }
+
+  .zen-challenge-metrics {
+    width: 100%;
+    margin-left: 0;
+    min-height: 23px;
+    gap: .24rem;
+    justify-content: space-between;
+  }
+
+  .zen-challenge-metric {
+    gap: .22rem;
+    padding: .2rem .32rem;
+    border-radius: 7px;
+    font-size: .57rem;
+  }
+
+  .zen-challenge-metric-icon {
+    width: 12px;
+    height: 12px;
+    flex-basis: 12px;
+  }
+
+  .zen-challenge-progress-block {
+    top: auto !important;
+  }
+
+  .zen-challenge-progress-meta {
+    margin-bottom: .2rem !important;
+  }
+
+  .zen-challenge-card-bottom {
+    flex-basis: 27px !important;
+    min-height: 27px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .zen-challenge-metrics {
+    gap: .12rem;
+  }
+
+  .zen-challenge-metric {
+    gap: .16rem;
+    padding: .18rem .24rem;
+    font-size: .49rem;
+  }
+
+  .zen-challenge-metric-icon {
+    width: 10px;
+    height: 10px;
+    flex-basis: 10px;
+  }
+}
+
+/* Bar fill must represent the exact computed percentage (including 0%). */
+.zen-challenge-progress-fill { min-width: 0 !important; }

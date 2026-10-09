@@ -7,12 +7,20 @@ import {
   daysElapsed,
   daysRemaining,
   progressPercent,
+  completedCheckInDays,
   currentStreak,
   isCheckedInToday,
   toggleTodayCheckIn,
 } from "@/lib/skills";
 import { SyncStatus } from "@/components/SyncStatus";
-import { IconPencil, IconShare, IconTrash } from "@/components/icons";
+import {
+  IconCalendar,
+  IconCheckCircle,
+  IconHourglass,
+  IconPencil,
+  IconShare,
+  IconTrash,
+} from "@/components/icons";
 import { generateShareCard, shareOrDownload } from "@/lib/shareCard";
 import { useLevel } from "@/lib/use-google-data";
 
@@ -282,6 +290,9 @@ export default function SkillsPage() {
             const streak = currentStreak(skill);
             const checkedToday = isCheckedInToday(skill);
             const pct = progressPercent(skill);
+            const currentDay = daysElapsed(skill) + 1;
+            const completedDays = completedCheckInDays(skill);
+            const remainingDays = daysRemaining(skill);
             return (
               <article key={skill.id} className="zen-challenge-card">
                 <div className="zen-challenge-card-top">
@@ -339,7 +350,6 @@ export default function SkillsPage() {
                           </button>
                         </div>
                       )}
-                      <p>Day {daysElapsed(skill) + 1} of {skill.durationDays} · {daysRemaining(skill)} days left</p>
                     </div>
                   </div>
 
@@ -353,13 +363,28 @@ export default function SkillsPage() {
                   </div>
                 </div>
 
+                <div className="zen-challenge-metrics" aria-label="Challenge statistics">
+                  <div className="zen-challenge-metric">
+                    <IconCalendar className="zen-challenge-metric-icon" />
+                    <span>Day <strong>{currentDay}</strong> of {skill.durationDays}</span>
+                  </div>
+                  <div className="zen-challenge-metric">
+                    <IconCheckCircle className="zen-challenge-metric-icon" />
+                    <span>Check-ins: <strong>{completedDays}</strong> / {skill.durationDays} days</span>
+                  </div>
+                  <div className="zen-challenge-metric">
+                    <IconHourglass className="zen-challenge-metric-icon" />
+                    <span><strong>{remainingDays}</strong> days left</span>
+                  </div>
+                </div>
+
                 <div className="zen-challenge-progress-block">
                   <div className="zen-challenge-progress-meta">
                     <span>Progress</span>
                     <span className="tabular-nums">{pct.toFixed(2)}%</span>
                   </div>
                   <div className="zen-challenge-progress-track" aria-label={`Progress ${pct.toFixed(2)} percent`}>
-                    <div className="zen-challenge-progress-fill" style={{ width: `${Math.max(pct, 2)}%` }} />
+                    <div className="zen-challenge-progress-fill" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
 

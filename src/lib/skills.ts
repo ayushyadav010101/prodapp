@@ -20,11 +20,24 @@ export function daysElapsed(skill: SkillChallenge): number {
 }
 
 export function daysRemaining(skill: SkillChallenge): number {
-  return Math.max(0, skill.durationDays - daysElapsed(skill));
+  // Day count is one-based (the start date is Day 1), so remaining days are
+  // measured after the current challenge day to avoid an off-by-one display.
+  const currentDay = daysElapsed(skill) + 1;
+  return Math.max(0, skill.durationDays - currentDay);
+}
+
+// Unique valid check-in dates are the single source of truth for both the
+// displayed check-in count and the progress percentage.
+export function completedCheckInDays(skill: SkillChallenge): number {
+  return new Set(
+    (Array.isArray(skill.completedDates) ? skill.completedDates : []).filter(
+      (date): date is string =>
+        typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date),
+    ),
+  ).size;
 }
 
 // Progress = unique check-in days / total challenge days * 100.
-// Count unique dates so legacy duplicate entries cannot inflate progress.
 // Keep the percentage bounded and stable at two decimal places.
 export function progressPercent(skill: SkillChallenge): number {
   const totalDays = Number.isFinite(skill.durationDays)
@@ -32,14 +45,7 @@ export function progressPercent(skill: SkillChallenge): number {
     : 0;
   if (totalDays <= 0) return 0;
 
-  const completedCheckInDays = new Set(
-    (Array.isArray(skill.completedDates) ? skill.completedDates : []).filter(
-      (date): date is string =>
-        typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date),
-    ),
-  ).size;
-
-  const raw = (completedCheckInDays / totalDays) * 100;
+  const raw = (completedCheckInDays(skill) / totalDays) * 100;
   return Math.min(100, Math.max(0, Math.round(raw * 100) / 100));
 }
 
