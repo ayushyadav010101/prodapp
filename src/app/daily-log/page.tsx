@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { IconCalendar, IconCheck, IconChevronLeft, IconChevronRight, IconDailyLog, IconProfile } from "@/components/icons";
-import { DAILY_FLOW_ICONS, DEFAULT_DAILY_FLOWS, emptyDailyEntry, type DailyFlowIcon, type DailyLogEntry, type DailyLogFlow } from "@/lib/daily-log";
+import { DAILY_FLOW_ICONS, DEFAULT_DAILY_FLOWS, emptyDailyEntry, isDateKey, type DailyFlowIcon, type DailyLogEntry, type DailyLogFlow } from "@/lib/daily-log";
 import styles from "./DailyLog.module.css";
 
 type FlowIconProps = { icon: DailyFlowIcon; className?: string };
@@ -67,7 +67,7 @@ export default function DailyLogPage() {
 
   useEffect(() => {
     const key = new URLSearchParams(window.location.search).get("date");
-    if (key && /^\d{4}-\d{2}-\d{2}$/.test(key) && !Number.isNaN(parseDate(key).getTime())) setSelectedDate(parseDate(key));
+    if (isDateKey(key)) setSelectedDate(parseDate(key));
     setDateReady(true);
   }, []);
 
@@ -82,7 +82,7 @@ export default function DailyLogPage() {
       const nextEntries = Array.isArray(data.entries) ? data.entries as DailyLogEntry[] : [];
       setFlows(nextFlows); setEntries(nextEntries);
       const queryKey = new URLSearchParams(window.location.search).get("date");
-      const key = queryKey && /^\d{4}-\d{2}-\d{2}$/.test(queryKey) ? queryKey : dateKey(new Date());
+      const key = isDateKey(queryKey) ? queryKey : dateKey(new Date());
       setSelectedDate(parseDate(key));
       setDraftEntry(nextEntries.find((entry) => entry.date === key) ?? emptyDailyEntry(key));
       setEntryDirty(false); setConfigDirty(false); setLoaded(true);
@@ -116,6 +116,7 @@ export default function DailyLogPage() {
 
   const changeDate = async (nextDate: Date) => {
     if (saving) return;
+    if (Number.isNaN(nextDate.getTime())) { setNotice("Choose a valid date."); return; }
     const nextKey = dateKey(nextDate); if (nextKey === selectedKey) return;
     if (entryDirty) {
       setSaving(true);
@@ -135,9 +136,11 @@ export default function DailyLogPage() {
   };
   const updateFlow = (flowId: string, patch: Partial<DailyLogFlow>) => { setFlows((current) => current.map((flow) => flow.id === flowId ? { ...flow, ...patch } : flow)); setConfigDirty(true); };
   const saveFlowConfig = async (nextFlows = flows) => {
-    setSaving(true); setNotice("");
+    // Keep a retryable dirty state unless the server confirms persistence.
+    // This also covers add/rename/reorder/archive/icon changes, not just plans.
+    setConfigDirty(true); setSaving(true); setNotice("");
     try { await persistConfig(nextFlows); setNotice("Flow settings saved."); }
-    catch (error) { setNotice(error instanceof Error ? error.message : "Could not save flow settings"); }
+    catch (error) { setConfigDirty(true); const detail = error instanceof Error ? error.message : "Could not save flow settings"; setNotice(`${detail}. Your changes remain in this page; retry with Save Entry.`); }
     finally { setSaving(false); }
   };
   const renameFlow = async (flowId: string) => {
@@ -183,7 +186,7 @@ export default function DailyLogPage() {
       <div className={styles.headerActions}>
         <div className={styles.dateNav}><button type="button" aria-label="Previous day" disabled={saving} onClick={previousDay}><IconChevronLeft className={styles.tinyIcon} /></button><div role="button" tabIndex={0} className={styles.dateDisplay} onClick={() => { const picker = datePickerRef.current; if (!picker) return; try { if (typeof picker.showPicker === "function") { picker.showPicker(); return; } } catch { /* Fall back if the browser blocks showPicker(). */ } picker.click(); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); const picker = datePickerRef.current; if (!picker) return; try { if (typeof picker.showPicker === "function") { picker.showPicker(); return; } } catch { /* Fall back if the browser blocks showPicker(). */ } picker.click(); } }}><IconCalendar className={styles.tinyIcon} /><span>{formatDate(selectedDate)}</span><input ref={datePickerRef} type="date" value={selectedKey} onChange={(event) => { if (event.target.value) void changeDate(parseDate(event.target.value)); }} aria-label="Choose selected date" /></div><button type="button" aria-label="Next day" disabled={saving} onClick={nextDay}><IconChevronRight className={styles.tinyIcon} /></button></div>
         <button type="button" className={styles.primaryButton} onClick={saveEntry} disabled={saving || !loaded}><IconDailyLog className={styles.actionIcon} /> {saving ? "Saving…" : "Save Entry"}</button>
-        <div className={styles.overflowWrap}><button type="button" className={styles.overflowButton} aria-label="More Daily Log actions" aria-expanded={showOverflow} onClick={() => setShowOverflow((value) => !value)}>⋮</button>{showOverflow && <div className={styles.overflowMenu}><button type="button" onClick={() => { setShowOverflow(false); goToday(); }}>Go to today</button><button type="button" onClick={() => { setShowOverflow(false); router.push("/daily-log/history"); }}>View saved history</button><button type="button" onClick={() => { setShowOverflow(false); const blob = new Blob([JSON.stringify({ flows, entries }, null, 2)], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "daily-log-backup.json"; a.click(); URL.revokeObjectURL(url); }}>Download backup</button></div>}</div>
+        <div className={styles.overflowWrap}><button type="button" className={styles.overflowButton} aria-label="More Daily Log actions" aria-expanded={showOverflow} disabled={saving} onClick={() => setShowOverflow((value) => !value)}>⋮</button>{showOverflow && <div className={styles.overflowMenu}><button type="button" disabled={saving} onClick={() => { setShowOverflow(false); goToday(); }}>Go to today</button><button type="button" disabled={saving} onClick={() => { setShowOverflow(false); router.push("/daily-log/history"); }}>View saved history</button><button type="button" disabled={saving} onClick={() => { setShowOverflow(false); const blob = new Blob([JSON.stringify({ flows, entries }, null, 2)], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "daily-log-backup.json"; a.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000); }}>Download backup</button></div>}</div>
       </div>
     </header>
     {loadingError && <div className={styles.errorNotice} role="alert">{loadingError}<button type="button" onClick={() => void loadDailyLog()}>Retry</button></div>}
@@ -194,20 +197,20 @@ export default function DailyLogPage() {
         <section className={styles.introCard}>
           <div className={styles.avatar}>{avatarUrl ? <img src={avatarUrl} alt={`${session?.user?.name ?? "User"} profile`} referrerPolicy="no-referrer" /> : <span>{avatarInitials || <IconProfile className={styles.avatarFallback} />}</span>}</div>
           <div className={styles.introText}><p className={styles.orangeLabel}>{isToday ? "Today" : "Selected date"}</p><h2>{formatDate(selectedDate)}</h2><p>"Small steps every day lead to big results."</p></div>
-          <button type="button" className={styles.addFlowButton} onClick={() => setShowAddFlow(true)}><span>＋</span> Add Flow</button>
+          <button type="button" className={styles.addFlowButton} disabled={saving} onClick={() => setShowAddFlow(true)}><span>＋</span> Add Flow</button>
         </section>
 
         <section className={styles.flowSection} aria-label="Daily flows">
           <div className={`${styles.tableHeader} ${styles.flowGrid}`}><span aria-label="Drag handle column">#</span><span>Flow</span><span className={styles.planHeading}>Plan</span><span className={styles.centerHeading}>Today</span><span>My Notes</span><span /></div>
           {!loaded ? <div className={styles.loadingState}>Loading your saved flows…</div> : activeFlows.length === 0 ? <div className={styles.emptyState}>No active flows yet. Add a flow to start tracking your day.</div> : activeFlows.map((flow) => <div className={`${styles.flowRow} ${flow.id === "flow-dsa" || flow.id === "flow-anime" ? styles.flowRowTall : ""} ${styles.flowGrid}`} key={flow.id} id={`flow-${flow.id}`} onDragOver={(event) => event.preventDefault()} onDrop={() => void reorderFlow(flow.id)}>
-            <div className={styles.dragCell}><button type="button" aria-label={`Drag to reorder ${flow.name}`} draggable onDragStart={() => setDraggedFlowId(flow.id)} onDragEnd={() => setDraggedFlowId(null)} className={styles.dragHandle}>⠿</button></div>
-            <div className={styles.flowIdentity}><span className={styles.flowIcon} style={{ color: flow.color, backgroundColor: `${flow.color}20` }}><FlowIcon icon={flow.icon} /></span>{editingFlowId === flow.id ? <form className={styles.renameForm} onSubmit={(event) => { event.preventDefault(); void renameFlow(flow.id); }}><input value={renameValue} autoFocus onChange={(event) => setRenameValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Escape") setEditingFlowId(null); }} aria-label="Flow name" /><button type="submit">Save</button></form> : <span className={styles.flowName}>{flow.name}</span>}</div>
+            <div className={styles.dragCell}><button type="button" aria-label={`Drag to reorder ${flow.name}`} draggable={!saving} disabled={saving} onDragStart={() => setDraggedFlowId(flow.id)} onDragEnd={() => setDraggedFlowId(null)} className={styles.dragHandle}>⠿</button></div>
+            <div className={styles.flowIdentity}><span className={styles.flowIcon} style={{ color: flow.color, backgroundColor: `${flow.color}20` }}><FlowIcon icon={flow.icon} /></span>{editingFlowId === flow.id ? <form className={styles.renameForm} onSubmit={(event) => { event.preventDefault(); void renameFlow(flow.id); }}><input value={renameValue} autoFocus disabled={saving} onChange={(event) => setRenameValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Escape") setEditingFlowId(null); }} aria-label="Flow name" /><button type="submit" disabled={saving}>Save</button></form> : <span className={styles.flowName}>{flow.name}</span>}</div>
             <div className={styles.planCell}><textarea rows={flow.id === "flow-dsa" || flow.id === "flow-anime" ? 2 : 1} aria-label={`${flow.name} persistent plan`} disabled={saving} value={flow.plan} maxLength={350} placeholder="Plan for this flow…" onChange={(event) => updateFlow(flow.id, { plan: event.target.value })} onBlur={() => { if (configDirty) void saveFlowConfig(); }} /></div>
             <div className={styles.todayCell}><input type="checkbox" aria-label={`Mark ${flow.name} complete for ${formatDate(selectedDate)}`} disabled={saving} checked={completed.has(flow.id)} onChange={() => toggleCompletion(flow.id)} /></div>
             <div className={styles.notesCell}><textarea rows={1} aria-label={`${flow.name} notes for ${formatDate(selectedDate)}`} disabled={saving} value={draftEntry.notes[flow.id] ?? ""} maxLength={500} placeholder={flow.id === "flow-general-notes" ? "What went good today? What can improve?" : `e.g. ${flow.name === "DSA" ? "Arrays, Sorting, 5 questions…" : flow.name === "Anime / Movie" ? "One Piece Ep 100–102…" : flow.name === "Workout" ? "Gym - Chest + Triceps" : flow.name === "Skill" ? "Web Dev, React Hooks…" : flow.name === "Calories" ? "2079 / 2510, Meals…" : "Add today's notes…"}`} onChange={(event) => updateNote(flow.id, event.target.value)} /></div>
-            <div className={styles.actionCell}><button type="button" aria-label={`Actions for ${flow.name}`} className={styles.rowAction} onClick={() => setMenuFlowId((current) => current === flow.id ? null : flow.id)}>⋮</button>{menuFlowId === flow.id && <div className={styles.rowMenu}><button type="button" onClick={() => { setEditingFlowId(flow.id); setRenameValue(flow.name); setMenuFlowId(null); }}>Rename flow</button><button type="button" onClick={() => void cycleIcon(flow)}>Change icon/color</button><button type="button" className={styles.dangerAction} onClick={() => void archiveFlow(flow)}>Delete flow</button></div>}</div>
+            <div className={styles.actionCell}><button type="button" aria-label={`Actions for ${flow.name}`} className={styles.rowAction} disabled={saving} onClick={() => setMenuFlowId((current) => current === flow.id ? null : flow.id)}>⋮</button>{menuFlowId === flow.id && <div className={styles.rowMenu}><button type="button" disabled={saving} onClick={() => { setEditingFlowId(flow.id); setRenameValue(flow.name); setMenuFlowId(null); }}>Rename flow</button><button type="button" disabled={saving} onClick={() => void cycleIcon(flow)}>Change icon/color</button><button type="button" disabled={saving} className={styles.dangerAction} onClick={() => void archiveFlow(flow)}>Delete flow</button></div>}</div>
           </div>)}
-          <button type="button" className={styles.addNewFlow} onClick={() => setShowAddFlow(true)}><span>＋</span> Add New Flow</button>
+          <button type="button" className={styles.addNewFlow} disabled={saving} onClick={() => setShowAddFlow(true)}><span>＋</span> Add New Flow</button>
         </section>
       </div>
 

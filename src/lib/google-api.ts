@@ -101,11 +101,21 @@ export async function listEvents(
 export async function listTaskLists(
   accessToken: string
 ): Promise<GoogleTaskList[]> {
-  const data = await googleFetch<{ items: GoogleTaskList[] }>(
-    `${TASKS_BASE}/users/@me/lists`,
-    accessToken
-  );
-  return data.items ?? [];
+  // Follow pagination so the Daily Log's internal list is still found for
+  // accounts with more than the default first page of task lists.
+  const allLists: GoogleTaskList[] = [];
+  let pageToken: string | undefined;
+  do {
+    const params = new URLSearchParams({ maxResults: "100" });
+    if (pageToken) params.set("pageToken", pageToken);
+    const data = await googleFetch<{ items?: GoogleTaskList[]; nextPageToken?: string }>(
+      `${TASKS_BASE}/users/@me/lists?${params}`,
+      accessToken
+    );
+    allLists.push(...(data.items ?? []));
+    pageToken = data.nextPageToken;
+  } while (pageToken);
+  return allLists;
 }
 
 export async function listTasks(
