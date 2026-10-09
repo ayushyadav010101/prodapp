@@ -112,16 +112,25 @@ export async function listTasks(
   accessToken: string,
   taskListId: string
 ): Promise<GoogleTask[]> {
-  const params = new URLSearchParams({
-    showCompleted: "true",
-    showHidden: "true",
-    maxResults: "100",
-  });
-  const data = await googleFetch<{ items: GoogleTask[] }>(
-    `${TASKS_BASE}/lists/${encodeURIComponent(taskListId)}/tasks?${params}`,
-    accessToken
-  );
-  return (data.items ?? []).map((t) => ({ ...t, taskListId }));
+  // Follow Google Tasks pagination so saved Daily Log history is not silently
+  // truncated to the first 100 records. The page size stays at the API limit.
+  const allTasks: GoogleTask[] = [];
+  let pageToken: string | undefined;
+  do {
+    const params = new URLSearchParams({
+      showCompleted: "true",
+      showHidden: "true",
+      maxResults: "100",
+    });
+    if (pageToken) params.set("pageToken", pageToken);
+    const data = await googleFetch<{ items?: GoogleTask[]; nextPageToken?: string }>(
+      `${TASKS_BASE}/lists/${encodeURIComponent(taskListId)}/tasks?${params}`,
+      accessToken
+    );
+    allTasks.push(...(data.items ?? []));
+    pageToken = data.nextPageToken;
+  } while (pageToken);
+  return allTasks.map((task) => ({ ...task, taskListId }));
 }
 
 export async function insertEvent(

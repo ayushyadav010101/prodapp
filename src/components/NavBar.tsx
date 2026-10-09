@@ -8,6 +8,9 @@ import {
   IconCalendar,
   IconTasks,
   IconSkills,
+  IconDailyLog,
+  IconAnalytics,
+  IconSettings,
 } from "./icons";
 
 const NAV_ITEMS = [
@@ -15,7 +18,14 @@ const NAV_ITEMS = [
   { href: "/calendar", label: "Calendar", Icon: IconCalendar },
   { href: "/tasks", label: "Tasks", Icon: IconTasks },
   { href: "/skills", label: "ZenSpace", Icon: IconSkills },
+  { href: "/daily-log", label: "Daily Log", Icon: IconDailyLog },
+  { href: "/analytics", label: "Analytics", Icon: IconAnalytics },
+  { href: "/settings", label: "Settings", Icon: IconSettings },
 ];
+
+// Keep the mobile bottom bar readable: core sections plus the new Daily Log.
+// Analytics and Settings remain available in the desktop sidebar and from links.
+const MOBILE_NAV_ITEMS = NAV_ITEMS.filter((item) => item.href !== "/analytics" && item.href !== "/settings");
 
 export function NavBar() {
   const pathname = usePathname();
@@ -24,9 +34,9 @@ export function NavBar() {
   return (
     <>
       {/* Desktop masthead sidebar */}
-      <aside className="hidden md:flex md:flex-col md:w-[16.5rem] md:shrink-0 md:border-r md:border-rule md:py-8 md:px-6">
+      <aside className="hidden md:flex md:flex-col md:w-[220px] md:shrink-0 md:border-r md:border-rule md:py-8 md:px-4">
         <div className="mb-10">
-          <p className="font-serif text-3xl font-semibold tracking-tight text-ink lowercase">
+          <p className="font-serif text-[28px] font-semibold tracking-tight text-ink lowercase">
             conflict<span className="text-accent">-calendar</span>
           </p>
           <button
@@ -39,7 +49,7 @@ export function NavBar() {
         </div>
         <nav className="flex flex-col gap-1">
           {NAV_ITEMS.map((item) => {
-            const active = pathname === item.href;
+            const active = pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
             return (
               <Link
                 key={item.href}
@@ -61,8 +71,8 @@ export function NavBar() {
       {/* Mobile bottom nav — full-width, square edges, always dark regardless of theme */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-20">
         <ul className="flex items-stretch justify-between bg-nav-bg text-nav-fg px-1">
-          {NAV_ITEMS.map((item) => {
-            const active = pathname === item.href;
+          {MOBILE_NAV_ITEMS.map((item) => {
+            const active = pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
             return (
               <li key={item.href} className="flex-1">
                 <Link

@@ -284,3 +284,20 @@ export function IconShare({ className = "" }: { className?: string }) {
     </svg>
   );
 }
+
+export function IconDailyLog({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className}>
+      <rect x="4" y="3.5" width="16" height="17" rx="2" />
+      <path d="M8 2.5v3M16 2.5v3M7.5 9h9M8 13h3M8 16.5h8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function IconAnalytics({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className}>
+      <path d="M3 20.5h18M5 17v-5M10 17V6M15 17v-8M20 17V3.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}

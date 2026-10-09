@@ -5,6 +5,7 @@ import { listTaskLists, listTasks, insertTask, GoogleApiError } from "@/lib/goog
 import { SKILLS_LIST_TITLE } from "@/lib/skills-sync";
 import { LEVEL_LOG_LIST_TITLE } from "@/lib/level-sync";
 import { EVENT_CHECKIN_LIST_TITLE } from "@/lib/event-checkins";
+import { DAILY_LOG_LIST_TITLE } from "@/lib/daily-log";
 import {
   TODAY_TASK_LOG_LIST_TITLE,
   getTodayTaskIds,
@@ -34,7 +35,8 @@ export async function GET() {
         l.title !== SKILLS_LIST_TITLE &&
         l.title !== LEVEL_LOG_LIST_TITLE &&
         l.title !== EVENT_CHECKIN_LIST_TITLE &&
-        l.title !== TODAY_TASK_LOG_LIST_TITLE
+        l.title !== TODAY_TASK_LOG_LIST_TITLE &&
+        l.title !== DAILY_LOG_LIST_TITLE
     );
 
     const tasksByList = await Promise.all(

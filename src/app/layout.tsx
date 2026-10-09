@@ -20,7 +20,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "conflict-calendar",
-  description: "Calendar, Tasks & Skills, synced with Google",
+  description: "Calendar, Tasks, ZenSpace & Daily Log, synced with Google",
   manifest: "/manifest.json",
   icons: {
     icon: "/icons/icon-192.png",
