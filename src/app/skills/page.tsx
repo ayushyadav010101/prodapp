@@ -354,6 +354,17 @@ export default function SkillsPage() {
                   </div>
 
                   <div className="zen-challenge-actions">
+                    <button
+                      type="button"
+                      onClick={() => startSkillEdit(skill.id, skill.name)}
+                      disabled={editingSkillSavingId === skill.id}
+                      className="zen-mobile-edit-button"
+                      aria-label="Edit challenge name"
+                      title="Edit challenge name"
+                      style={{ visibility: editingSkillId === skill.id ? "hidden" : "visible" }}
+                    >
+                      <IconPencil className="w-5 h-5" />
+                    </button>
                     <button onClick={() => shareSkill(skill)} className="zen-challenge-icon-button" aria-label="Share progress">
                       <IconShare className="w-5 h-5" />
                     </button>
