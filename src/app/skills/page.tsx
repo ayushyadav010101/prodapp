@@ -295,7 +295,7 @@ export default function SkillsPage() {
             const remainingDays = daysRemaining(skill);
             return (
               <article key={skill.id} className="zen-challenge-card">
-                <div className="zen-challenge-card-top">
+                <div className="zen-challenge-left-column">
                   <div className="zen-challenge-identity">
                     <div className="zen-challenge-icon" aria-hidden="true">
                       {session?.user?.image ? (
@@ -306,7 +306,7 @@ export default function SkillsPage() {
                     </div>
                     <div className="zen-challenge-title-group min-w-0">
                       {editingSkillId === skill.id ? (
-                        <div className="flex items-center gap-2 min-w-0">
+                        <div className="zen-title-editor flex items-center gap-2 min-w-0">
                           <input
                             autoFocus
                             value={editSkillName}
@@ -336,7 +336,7 @@ export default function SkillsPage() {
                           </button>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-2 min-w-0">
+                        <div className="zen-title-display flex items-center gap-2 min-w-0">
                           <h3 className="truncate">{skill.name}</h3>
                           <button
                             type="button"
@@ -353,63 +353,63 @@ export default function SkillsPage() {
                     </div>
                   </div>
 
-                  <div className="zen-challenge-actions">
-                    <button
-                      type="button"
-                      onClick={() => startSkillEdit(skill.id, skill.name)}
-                      disabled={editingSkillSavingId === skill.id}
-                      className="zen-mobile-edit-button"
-                      aria-label="Edit challenge name"
-                      title="Edit challenge name"
-                      style={{ visibility: editingSkillId === skill.id ? "hidden" : "visible" }}
-                    >
-                      <IconPencil className="w-5 h-5" />
-                    </button>
-                    <button onClick={() => shareSkill(skill)} className="zen-challenge-icon-button" aria-label="Share progress">
-                      <IconShare className="w-5 h-5" />
-                    </button>
-                    <button onClick={() => removeSkill(skill.id, skill.name)} className="zen-challenge-icon-button" aria-label="Delete challenge">
-                      <IconTrash className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="zen-challenge-metrics" aria-label="Challenge statistics">
-                  <div className="zen-challenge-metric">
-                    <IconCalendar className="zen-challenge-metric-icon" />
-                    <span>Day <strong>{currentDay}</strong> of {skill.durationDays}</span>
-                  </div>
-                  <div className="zen-challenge-metric">
-                    <IconCheckCircle className="zen-challenge-metric-icon" />
-                    <span>Check-ins: <strong>{completedDays}</strong> / {skill.durationDays} days</span>
-                  </div>
-                  <div className="zen-challenge-metric">
-                    <IconHourglass className="zen-challenge-metric-icon" />
-                    <span><strong>{remainingDays}</strong> days left</span>
-                  </div>
-                </div>
-
-                <div className="zen-challenge-progress-block">
-                  <div className="zen-challenge-progress-meta">
-                    <span>Progress</span>
-                    <span className="tabular-nums">{pct.toFixed(2)}%</span>
-                  </div>
-                  <div className="zen-challenge-progress-track" aria-label={`Progress ${pct.toFixed(2)} percent`}>
-                    <div className="zen-challenge-progress-fill" style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-
-                <div className="zen-challenge-card-bottom">
                   <div className="zen-challenge-streak">
                     <span className="zen-challenge-flame" aria-hidden="true">🔥</span>
                     <span className="zen-challenge-streak-number">{streak}</span>
                     <span>day streak</span>
+                  </div>
+
+                  <div className="zen-challenge-progress-block">
+                    <div className="zen-challenge-progress-meta">
+                      <span>Progress</span>
+                      <span className="tabular-nums">{pct.toFixed(2)}%</span>
+                    </div>
+                    <div className="zen-challenge-progress-track" aria-label={`Progress ${pct.toFixed(2)} percent`}>
+                      <div className="zen-challenge-progress-fill" style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="zen-challenge-middle-column">
+                  <div className="zen-challenge-metrics" aria-label="Challenge statistics">
+                    <div className="zen-challenge-metric">
+                      <IconCalendar className="zen-challenge-metric-icon" />
+                      <span>Day <strong>{currentDay}</strong> of {skill.durationDays}</span>
+                    </div>
+                    <div className="zen-challenge-metric">
+                      <IconCheckCircle className="zen-challenge-metric-icon" />
+                      <span>Check-ins: <strong>{completedDays}</strong> / {skill.durationDays} days</span>
+                    </div>
+                    <div className="zen-challenge-metric">
+                      <IconHourglass className="zen-challenge-metric-icon" />
+                      <span><strong>{remainingDays}</strong> days left</span>
+                    </div>
                   </div>
                   <button
                     onClick={() => checkIn(skill)}
                     className={`zen-checkin-button ${checkedToday ? "is-done" : ""}`}
                   >
                     {checkedToday ? "✓ Done today" : "Check in"}
+                  </button>
+                </div>
+
+                <div className="zen-challenge-actions" aria-label="Challenge actions">
+                  <button
+                    type="button"
+                    onClick={() => startSkillEdit(skill.id, skill.name)}
+                    disabled={editingSkillSavingId === skill.id}
+                    className="zen-mobile-edit-button zen-challenge-icon-button"
+                    aria-label="Edit challenge name"
+                    title="Edit challenge name"
+                    style={{ visibility: editingSkillId === skill.id ? "hidden" : "visible" }}
+                  >
+                    <IconPencil className="w-5 h-5" />
+                  </button>
+                  <button type="button" onClick={() => shareSkill(skill)} className="zen-challenge-icon-button" aria-label="Share progress" title="Share progress">
+                    <IconShare className="w-5 h-5" />
+                  </button>
+                  <button type="button" onClick={() => removeSkill(skill.id, skill.name)} className="zen-challenge-icon-button" aria-label="Delete challenge" title="Delete challenge">
+                    <IconTrash className="w-5 h-5" />
                   </button>
                 </div>
               </article>
