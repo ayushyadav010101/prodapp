@@ -48,10 +48,9 @@
 .addFlowButton span, .addNewFlow span { font-size:24px; line-height:1; }
 .addFlowButton:hover { filter:brightness(1.06); }
 .flowSection { padding:8px 10px 12px; border:1px solid var(--rule); border-radius:14px; background:var(--paper-raised); min-width:0; }
-.flowGrid { display:grid; grid-template-columns:minmax(26px,4fr) minmax(95px,15fr) minmax(170px,36fr) minmax(44px,8fr) minmax(165px,34fr) minmax(24px,3fr); column-gap:8px; align-items:center; }
+.flowGrid { display:grid; grid-template-columns:minmax(26px,4fr) minmax(120px,20fr) minmax(44px,8fr) minmax(180px,65fr) minmax(24px,3fr); column-gap:8px; align-items:center; }
 .tableHeader { min-height:36px; padding:0 6px 6px; border-bottom:1px solid color-mix(in srgb, var(--rule) 70%, transparent); color:var(--accent); font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; }
 .tableHeader > span:nth-child(2) { padding-left:3px; }
-.planHeading { padding-left:2px; }
 .centerHeading { text-align:center; }
 .flowRow { position:relative; min-height:80px; padding:7px 6px; margin-top:2px; border:1px solid transparent; border-radius:10px; background:color-mix(in srgb, var(--paper-raised) 88%, var(--paper) 12%); }
 .flowRowTall { min-height:98px; }
@@ -63,12 +62,10 @@
 .flowIcon { display:flex; justify-content:center; align-items:center; width:42px; height:42px; border-radius:10px; flex:0 0 auto; }
 .flowIcon svg { width:25px; height:25px; }
 .flowName { display:block; width:100%; color:var(--ink); font-size:12px; font-weight:650; line-height:1.15; overflow-wrap:anywhere; }
-.planCell, .notesCell { min-width:0; width:100%; }
-.planCell textarea, .notesCell textarea { display:block; width:100%; min-width:0; resize:vertical; padding:10px; border:1px solid color-mix(in srgb, var(--rule) 72%, transparent); border-radius:8px; color:var(--ink); background:color-mix(in srgb, var(--paper) 48%, var(--paper-raised) 52%); font-family:var(--font-inter), sans-serif; font-size:12px; line-height:1.5; outline:none; }
-.planCell textarea { min-height:43px; }
-.planCell textarea[rows="2"] { min-height:62px; }
+.notesCell { min-width:0; width:100%; }
+.notesCell textarea { display:block; width:100%; min-width:0; min-height:43px; resize:vertical; padding:10px; border:1px solid color-mix(in srgb, var(--rule) 72%, transparent); border-radius:8px; color:var(--ink); background:color-mix(in srgb, var(--paper) 48%, var(--paper-raised) 52%); font-family:var(--font-inter), sans-serif; font-size:12px; line-height:1.5; outline:none; }
 .notesCell textarea { min-height:43px; }
-.planCell textarea:focus, .notesCell textarea:focus { border-color:var(--accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 16%, transparent); }
+.notesCell textarea:focus { border-color:var(--accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 16%, transparent); }
 .todayCell { display:flex; align-items:center; justify-content:center; }
 .todayCell input { appearance:none; width:24px; height:24px; margin:0; border:2px solid color-mix(in srgb, var(--ink-soft) 65%, transparent); border-radius:3px; background:transparent; cursor:pointer; position:relative; }
 .todayCell input:checked { background:var(--accent); border-color:var(--accent); }
@@ -135,7 +132,7 @@
   .pageHeader { flex-direction:column; gap:12px; }
   .headerActions { justify-content:flex-start; padding-top:0; }
   .rightSidebar { grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .flowGrid { grid-template-columns:24px minmax(90px,1fr) minmax(120px,1fr) 48px minmax(140px,1.2fr) 24px; column-gap:7px; }
+  .flowGrid { grid-template-columns:24px minmax(105px,.8fr) 48px minmax(170px,1.8fr) 24px; column-gap:7px; }
 }
 @media (max-width: 760px) {
   .page { padding:12px 10px 100px; }
@@ -156,30 +153,25 @@
   .addFlowButton { grid-column:1 / -1; width:100%; min-height:38px; }
   .flowSection { padding:7px; }
   .tableHeader { display:none !important; }
-  /* Mobile flow cards use a compact two-part layout: identity on the left,
-     Plan and date-specific Notes stacked on the right. Checkbox/menu span both fields. */
+  /* Compact mobile row: flow identity on the left, date-specific notes on the right. */
   .flowGrid {
     grid-template-columns:22px 76px minmax(0,1fr) 25px 20px;
-    grid-template-areas:"drag identity plan today actions" "drag identity notes today actions";
+    grid-template-areas:"drag identity notes today actions";
     column-gap:6px;
-    row-gap:7px;
+    row-gap:0;
   }
   .flowRow, .flowRowTall { padding:10px 6px; margin-top:6px; min-height:0; align-items:center; }
   .dragCell { grid-area:drag; align-self:stretch; }
-  .flowIdentity { grid-area:identity; grid-row:1 / span 2; align-self:center; }
+  .flowIdentity { grid-area:identity; align-self:center; }
   .flowIcon { width:38px; height:38px; }
   .flowIcon svg { width:23px; height:23px; }
   .flowName { font-size:12px; line-height:1.15; }
-  .planCell { grid-area:plan; }
-  .planCell::before, .notesCell::before { display:block; margin:0 0 3px; color:var(--ink-soft); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
-  .planCell::before { content:"Plan"; }
   .notesCell { grid-area:notes; }
-  .notesCell::before { content:"My Notes"; }
-  .planCell textarea, .notesCell textarea { min-height:40px; font-size:11px; padding:7px 8px; }
-  .planCell textarea[rows="2"] { min-height:52px; }
-  .todayCell { grid-area:today; grid-row:1 / span 2; align-self:center; }
+  .notesCell::before { content:"My Notes"; display:block; margin:0 0 3px; color:var(--ink-soft); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+  .notesCell textarea { min-height:40px; font-size:11px; padding:7px 8px; }
+  .todayCell { grid-area:today; align-self:center; }
   .todayCell input { width:21px; height:21px; }
-  .actionCell { grid-area:actions; grid-row:1 / span 2; align-self:stretch; }
+  .actionCell { grid-area:actions; align-self:center; }
   .rowAction { width:25px; }
   .rowMenu { right:0; min-width:130px; }
   .addNewFlow { min-height:52px; margin-top:9px; }
@@ -194,7 +186,7 @@
 @media (max-width: 380px) {
   .page { padding-left:8px; padding-right:8px; }
   .flowSection { padding:6px; }
-  .flowGrid { grid-template-columns:18px 66px minmax(0,1fr) 23px 17px; column-gap:4px; row-gap:6px; }
+  .flowGrid { grid-template-columns:18px 66px minmax(0,1fr) 23px 17px; column-gap:4px; row-gap:0; }
   .flowIcon { width:34px; height:34px; }
   .flowIcon svg { width:21px; height:21px; }
   .flowName { font-size:11px; }
