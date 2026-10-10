@@ -89,18 +89,6 @@
 .sideCardHeader > span { color:var(--ink-soft); white-space:nowrap; font-size:11px; }
 .orangeLink { color:var(--accent); font-size:12px; font-weight:650; white-space:nowrap; }
 .orangeLink:hover { text-decoration:underline; }
-.progressList { display:flex; flex-direction:column; gap:2px; }
-.progressItem { display:grid; grid-template-columns:27px minmax(0,1fr) 20px 12px; align-items:center; gap:8px; width:100%; min-height:34px; text-align:left; border-radius:7px; }
-.progressItem:hover { background:color-mix(in srgb, var(--accent) 7%, transparent); }
-.progressIcon { width:25px; height:25px; display:flex; align-items:center; justify-content:center; border-radius:6px; }
-.progressIcon svg { width:17px; height:17px; }
-.progressName { color:var(--ink); font-size:12px; font-weight:550; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.progressCheckbox { display:flex; align-items:center; justify-content:center; width:16px; height:16px; border:1.5px solid var(--ink-soft); border-radius:50%; color:#23170f; }
-.progressCheckbox svg { width:12px; height:12px; }
-.progressCheckboxDone { border-color:var(--accent); background:var(--accent); }
-.progressArrow { color:var(--ink-soft); font-size:20px; text-align:right; line-height:1; }
-.progressFooter { height:4px; margin-top:9px; border-radius:10px; background:color-mix(in srgb, var(--rule) 35%, transparent); overflow:hidden; }
-.progressFooter span { display:block; height:100%; background:var(--accent); border-radius:inherit; transition:width .2s; }
 .recentList { display:flex; flex-direction:column; gap:2px; }
 .recentEntry { display:grid; grid-template-columns:20px minmax(0,1fr) 13px; align-items:center; gap:9px; min-height:40px; border-radius:7px; padding:3px 1px; }
 .recentEntry:hover { background:color-mix(in srgb, var(--accent) 7%, transparent); }
@@ -125,13 +113,13 @@
 
 @media (max-width: 1220px) {
   .dashboardGrid { grid-template-columns:minmax(0,1fr); }
-  .rightSidebar { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
+  .rightSidebar { display:grid; grid-template-columns:minmax(0,1fr); align-items:start; }
 }
 @media (max-width: 1000px) {
   .page { padding:12px 12px 25px; }
   .pageHeader { flex-direction:column; gap:12px; }
   .headerActions { justify-content:flex-start; padding-top:0; }
-  .rightSidebar { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .rightSidebar { grid-template-columns:minmax(0,1fr); }
   .flowGrid { grid-template-columns:24px minmax(105px,.8fr) 48px minmax(170px,1.8fr) 24px; column-gap:7px; }
 }
 @media (max-width: 760px) {
@@ -177,10 +165,6 @@
   .addNewFlow { min-height:52px; margin-top:9px; }
   .rightSidebar { display:flex; flex-direction:column; }
   .sideCard { padding:11px; }
-  .progressList { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:3px 7px; }
-  .progressItem { grid-template-columns:24px minmax(0,1fr) 17px; gap:5px; }
-  .progressArrow { display:none; }
-  .progressName { font-size:11px; }
   .recentEntry { min-height:42px; }
 }
 @media (max-width: 380px) {
@@ -230,7 +214,6 @@
 }
 .tinyIcon { width:16px; height:16px; flex:0 0 auto; }
 .actionIcon { width:16px; height:16px; flex:0 0 auto; }
-.checkIcon { width:12px; height:12px; }
 .avatarFallback { width:42px; height:42px; }
 .recentDocIcon { width:19px; height:19px; flex:0 0 auto; }
 .recentChevron { width:13px; height:13px; flex:0 0 auto; }

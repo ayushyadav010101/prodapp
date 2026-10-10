@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useSession, signIn } from "next-auth/react";
-import { IconCalendar, IconCheck, IconChevronLeft, IconChevronRight, IconDailyLog, IconProfile } from "@/components/icons";
+import { IconCalendar, IconChevronLeft, IconChevronRight, IconDailyLog, IconProfile } from "@/components/icons";
 import { DAILY_FLOW_ICONS, DEFAULT_DAILY_FLOWS, emptyDailyEntry, isDateKey, type DailyFlowIcon, type DailyLogEntry, type DailyLogFlow } from "@/lib/daily-log";
 import styles from "./DailyLog.module.css";
 
@@ -59,7 +59,6 @@ export default function DailyLogPage() {
   const selectedKey = dateKey(selectedDate);
   const activeFlows = useMemo(() => flows.filter((flow) => !flow.archived).sort((a, b) => a.order - b.order), [flows]);
   const completed = useMemo(() => new Set(draftEntry.completedFlowIds), [draftEntry.completedFlowIds]);
-  const completedCount = activeFlows.filter((flow) => completed.has(flow.id)).length;
   const avatarUrl = session?.user?.image ?? "";
   const avatarInitials = (session?.user?.name ?? "U").split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
   const isToday = selectedKey === dateKey(new Date());
@@ -212,11 +211,6 @@ export default function DailyLogPage() {
       </div>
 
       <aside className={styles.rightSidebar}>
-        <section className={styles.sideCard}>
-          <div className={styles.sideCardHeader}><h2>Today&apos;s Progress</h2><span>{completedCount} / {activeFlows.length} completed</span></div>
-          <div className={styles.progressList}>{activeFlows.map((flow) => { const done = completed.has(flow.id); return <button type="button" key={flow.id} className={styles.progressItem} onClick={() => document.getElementById(`flow-${flow.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" })}><span className={styles.progressIcon} style={{ color: flow.color, backgroundColor: `${flow.color}20` }}><FlowIcon icon={flow.icon} /></span><span className={styles.progressName}>{flow.name}</span><span className={`${styles.progressCheckbox} ${done ? styles.progressCheckboxDone : ""}`}>{done && <IconCheck className={styles.checkIcon} />}</span><span className={styles.progressArrow}>›</span></button>; })}</div>
-          <div className={styles.progressFooter}><span style={{ width: `${activeFlows.length ? (completedCount / activeFlows.length) * 100 : 0}%` }} /></div>
-        </section>
         <section className={styles.sideCard}>
           <div className={styles.sideCardHeader}><h2>Recent Entries</h2><Link href="/daily-log/history" className={styles.orangeLink}>View All</Link></div>
           {entries.slice(0, 5).length ? <div className={styles.recentList}>{entries.slice(0, 5).map((entry) => <button type="button" key={entry.date} onClick={() => void changeDate(parseDate(entry.date))} className={styles.recentEntry}><IconDailyLog className={styles.actionIcon} /><span><strong>{formatDate(parseDate(entry.date), { day: "numeric", month: "short", year: "numeric" })}</strong><small>{entryPreview(entry, flows)}</small></span><IconChevronRight className={styles.tinyIcon} /></button>)}</div> : <div className={styles.sideEmpty}>Your saved daily entries appear here. Use <strong>Save Entry</strong> to start your history.</div>}
