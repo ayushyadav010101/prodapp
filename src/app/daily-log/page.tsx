@@ -35,6 +35,8 @@ export default function DailyLogPage() {
   const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
   const datePickerRef = useRef<HTMLInputElement>(null);
+  const overflowWrapRef = useRef<HTMLDivElement>(null);
+  const openRowMenuRef = useRef<HTMLDivElement>(null);
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [dateReady, setDateReady] = useState(false);
   const [flows, setFlows] = useState<DailyLogFlow[]>(DEFAULT_DAILY_FLOWS);
@@ -62,6 +64,42 @@ export default function DailyLogPage() {
   const avatarUrl = session?.user?.image ?? "";
   const avatarInitials = (session?.user?.name ?? "U").split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
   const isToday = selectedKey === dateKey(new Date());
+
+  // Dismiss either menu when the user clicks/taps elsewhere, and support Escape.
+  // Ignore clicks on menu toggles so switching directly between menus still works.
+  useEffect(() => {
+    if (!showOverflow && !menuFlowId) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+
+      const element = target instanceof Element ? target : target.parentElement;
+      const clickedOverflowToggle = Boolean(element?.closest("[data-daily-overflow-toggle]"));
+      const clickedFlowToggle = Boolean(element?.closest("[data-daily-flow-toggle]"));
+
+      if (showOverflow && !overflowWrapRef.current?.contains(target) && !clickedOverflowToggle) {
+        setShowOverflow(false);
+      }
+      if (menuFlowId && !openRowMenuRef.current?.contains(target) && !clickedFlowToggle) {
+        setMenuFlowId(null);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setShowOverflow(false);
+        setMenuFlowId(null);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [showOverflow, menuFlowId]);
 
   useEffect(() => {
     const key = new URLSearchParams(window.location.search).get("date");
@@ -183,7 +221,7 @@ export default function DailyLogPage() {
       <div className={styles.headerActions}>
         <div className={styles.dateNav}><button type="button" aria-label="Previous day" disabled={saving} onClick={previousDay}><IconChevronLeft className={styles.tinyIcon} /></button><div role="button" tabIndex={0} className={styles.dateDisplay} onClick={() => { const picker = datePickerRef.current; if (!picker) return; try { if (typeof picker.showPicker === "function") { picker.showPicker(); return; } } catch { /* Fall back if the browser blocks showPicker(). */ } picker.click(); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); const picker = datePickerRef.current; if (!picker) return; try { if (typeof picker.showPicker === "function") { picker.showPicker(); return; } } catch { /* Fall back if the browser blocks showPicker(). */ } picker.click(); } }}><IconCalendar className={styles.tinyIcon} /><span>{formatDate(selectedDate)}</span><input ref={datePickerRef} type="date" value={selectedKey} onChange={(event) => { if (event.target.value) void changeDate(parseDate(event.target.value)); }} aria-label="Choose selected date" /></div><button type="button" aria-label="Next day" disabled={saving} onClick={nextDay}><IconChevronRight className={styles.tinyIcon} /></button></div>
         <button type="button" className={styles.primaryButton} onClick={saveEntry} disabled={saving || !loaded}><IconDailyLog className={styles.actionIcon} /> {saving ? "Saving…" : "Save Entry"}</button>
-        <div className={styles.overflowWrap}><button type="button" className={styles.overflowButton} aria-label="More Daily Log actions" aria-expanded={showOverflow} disabled={saving} onClick={() => setShowOverflow((value) => !value)}>⋮</button>{showOverflow && <div className={styles.overflowMenu}><button type="button" disabled={saving} onClick={() => { setShowOverflow(false); goToday(); }}>Go to today</button><button type="button" disabled={saving} onClick={() => { setShowOverflow(false); router.push("/daily-log/history"); }}>View saved history</button></div>}</div>
+        <div className={styles.overflowWrap} ref={overflowWrapRef}><button type="button" data-daily-overflow-toggle aria-label="More Daily Log actions" className={styles.overflowButton} aria-expanded={showOverflow} disabled={saving} onClick={() => setShowOverflow((value) => !value)}>⋮</button>{showOverflow && <div className={styles.overflowMenu} role="menu"><button type="button" role="menuitem" disabled={saving} onClick={() => { setShowOverflow(false); goToday(); }}>Go to today</button><button type="button" role="menuitem" disabled={saving} onClick={() => { setShowOverflow(false); router.push("/daily-log/history"); }}>View saved history</button></div>}</div>
       </div>
     </header>
     {loadingError && <div className={styles.errorNotice} role="alert">{loadingError}<button type="button" onClick={() => void loadDailyLog()}>Retry</button></div>}
@@ -204,7 +242,7 @@ export default function DailyLogPage() {
             <div className={styles.flowIdentity}><span className={styles.flowIcon} style={{ color: flow.color, backgroundColor: `${flow.color}20` }}><FlowIcon icon={flow.icon} /></span>{editingFlowId === flow.id ? <form className={styles.renameForm} onSubmit={(event) => { event.preventDefault(); void renameFlow(flow.id); }}><input value={renameValue} autoFocus disabled={saving} onChange={(event) => setRenameValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Escape") setEditingFlowId(null); }} aria-label="Flow name" /><button type="submit" disabled={saving}>Save</button></form> : <span className={styles.flowName}>{flow.name}</span>}</div>
             <div className={styles.todayCell}><input type="checkbox" aria-label={`Mark ${flow.name} complete for ${formatDate(selectedDate)}`} disabled={saving} checked={completed.has(flow.id)} onChange={() => toggleCompletion(flow.id)} /></div>
             <div className={styles.notesCell}><textarea rows={1} aria-label={`${flow.name} notes for ${formatDate(selectedDate)}`} disabled={saving} value={draftEntry.notes[flow.id] ?? ""} maxLength={500} placeholder={flow.id === "flow-general-notes" ? "What went good today? What can improve?" : `e.g. ${flow.name === "DSA" ? "Arrays, Sorting, 5 questions…" : flow.name === "Anime / Movie" ? "One Piece Ep 100–102…" : flow.name === "Workout" ? "Gym - Chest + Triceps" : flow.name === "Skill" ? "Web Dev, React Hooks…" : flow.name === "Calories" ? "2079 / 2510, Meals…" : "Add today's notes…"}`} onChange={(event) => updateNote(flow.id, event.target.value)} /></div>
-            <div className={styles.actionCell}><button type="button" aria-label={`Actions for ${flow.name}`} className={styles.rowAction} disabled={saving} onClick={() => setMenuFlowId((current) => current === flow.id ? null : flow.id)}>⋮</button>{menuFlowId === flow.id && <div className={styles.rowMenu}><button type="button" disabled={saving} onClick={() => { setEditingFlowId(flow.id); setRenameValue(flow.name); setMenuFlowId(null); }}>Rename flow</button><button type="button" disabled={saving} onClick={() => void cycleIcon(flow)}>Change icon/color</button><button type="button" disabled={saving} className={styles.dangerAction} onClick={() => void archiveFlow(flow)}>Delete flow</button></div>}</div>
+            <div className={styles.actionCell} ref={menuFlowId === flow.id ? openRowMenuRef : undefined}><button type="button" data-daily-flow-toggle aria-label={`Actions for ${flow.name}`} aria-expanded={menuFlowId === flow.id} className={styles.rowAction} disabled={saving} onClick={() => setMenuFlowId((current) => current === flow.id ? null : flow.id)}>⋮</button>{menuFlowId === flow.id && <div className={styles.rowMenu} role="menu"><button type="button" role="menuitem" disabled={saving} onClick={() => { setEditingFlowId(flow.id); setRenameValue(flow.name); setMenuFlowId(null); }}>Rename flow</button><button type="button" role="menuitem" disabled={saving} onClick={() => void cycleIcon(flow)}>Change icon/color</button><button type="button" role="menuitem" disabled={saving} className={styles.dangerAction} onClick={() => void archiveFlow(flow)}>Delete flow</button></div>}</div>
           </div>)}
           <button type="button" className={styles.addNewFlow} disabled={saving} onClick={() => setShowAddFlow(true)}><span>＋</span> Add New Flow</button>
         </section>
