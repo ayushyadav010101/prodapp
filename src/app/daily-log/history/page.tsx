@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { IconChevronLeft, IconChevronRight, IconDailyLog } from "@/components/icons";
 import type { DailyLogEntry, DailyLogFlow } from "@/lib/daily-log";
+import { completedActiveIds } from "@/lib/daily-log-analytics";
 import styles from "../DailyLog.module.css";
 
 function asDate(key: string) {
@@ -50,7 +51,7 @@ export default function DailyLogHistoryPage() {
       {loading ? <div className={styles.loadingState}>Loading saved entries…</div> : entries.length === 0 ? <div className={styles.emptyState}>No saved entries yet. Save a Daily Log entry and it will appear here.</div> : entries.map((entry) => <Link key={entry.date} href={`/daily-log?date=${entry.date}`} className={styles.historyEntry}>
         <IconDailyLog className={styles.recentDocIcon} />
         <span><strong>{formatDate(entry.date)}</strong><small>{preview(entry, flows)}</small></span>
-        <span className={styles.historyMeta}>{entry.completedFlowIds.length} completed</span>
+        <span className={styles.historyMeta}>{completedActiveIds(entry, flows).length} completed</span>
         <IconChevronRight className={styles.tinyIcon} />
       </Link>)}
     </section>

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } fro
 import { useSession, signIn } from "next-auth/react";
 import { IconCalendar, IconChevronLeft, IconChevronRight, IconDailyLog, IconProfile } from "@/components/icons";
 import { DAILY_FLOW_ICONS, DEFAULT_DAILY_FLOWS, emptyDailyEntry, isDateKey, type DailyFlowIcon, type DailyLogEntry, type DailyLogFlow } from "@/lib/daily-log";
+import { summarizeDay } from "@/lib/daily-log-analytics";
 import styles from "./DailyLog.module.css";
 
 type FlowIconProps = { icon: DailyFlowIcon; className?: string };
@@ -46,6 +47,12 @@ export default function DailyLogPage() {
   const [loadingError, setLoadingError] = useState("");
   const [notice, setNotice] = useState("");
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const savingRef = useRef(false);
+  const editVersionRef = useRef(0);
+  const draftRef = useRef<DailyLogEntry>(draftEntry);
+  const entryDirtyRef = useRef(false);
+  const configDirtyRef = useRef(false);
   const [entryDirty, setEntryDirty] = useState(false);
   const [configDirty, setConfigDirty] = useState(false);
   const [showOverflow, setShowOverflow] = useState(false);
@@ -58,12 +65,20 @@ export default function DailyLogPage() {
   const [newFlowIcon, setNewFlowIcon] = useState<DailyFlowIcon>("spark");
   const [newFlowColor, setNewFlowColor] = useState("#ff8b52");
 
+  useEffect(() => { draftRef.current = draftEntry; entryDirtyRef.current = entryDirty; configDirtyRef.current = configDirty; });
+
   const selectedKey = dateKey(selectedDate);
   const activeFlows = useMemo(() => flows.filter((flow) => !flow.archived).sort((a, b) => a.order - b.order), [flows]);
   const completed = useMemo(() => new Set(draftEntry.completedFlowIds), [draftEntry.completedFlowIds]);
   const avatarUrl = session?.user?.image ?? "";
   const avatarInitials = (session?.user?.name ?? "U").split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
   const isToday = selectedKey === dateKey(new Date());
+  const daySummary = useMemo(() => summarizeDay(draftEntry.completedFlowIds, flows), [draftEntry.completedFlowIds, flows]);
+  const hasSavedEntry = entries.some((entry) => entry.date === selectedKey);
+  const unsaved = entryDirty || configDirty;
+  type SaveState = "saving" | "failed" | "unsaved" | "saved" | "none";
+  const saveState: SaveState = saving ? "saving" : saveError ? "failed" : unsaved ? "unsaved" : hasSavedEntry ? "saved" : "none";
+  const saveLabel = { saving: "Saving…", failed: "Save failed — Retry", unsaved: "Unsaved changes", saved: "Saved", none: "Not saved yet" }[saveState];
 
   // Dismiss either menu when the user clicks/taps elsewhere, and support Escape.
   // Ignore clicks on menu toggles so switching directly between menus still works.
@@ -102,6 +117,13 @@ export default function DailyLogPage() {
   }, [showOverflow, menuFlowId]);
 
   useEffect(() => {
+    if (!entryDirty && !configDirty) return;
+    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ""; };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [entryDirty, configDirty]);
+
+  useEffect(() => {
     const key = new URLSearchParams(window.location.search).get("date");
     if (isDateKey(key)) setSelectedDate(parseDate(key));
     setDateReady(true);
@@ -116,12 +138,16 @@ export default function DailyLogPage() {
       if (!response.ok) throw new Error(data.error ?? "Failed to load Daily Log");
       const nextFlows = Array.isArray(data.flows) ? data.flows as DailyLogFlow[] : DEFAULT_DAILY_FLOWS;
       const nextEntries = Array.isArray(data.entries) ? data.entries as DailyLogEntry[] : [];
-      setFlows(nextFlows); setEntries(nextEntries);
+      setEntries(nextEntries);
+      if (!configDirtyRef.current) setFlows(nextFlows);
       const queryKey = new URLSearchParams(window.location.search).get("date");
       const key = isDateKey(queryKey) ? queryKey : dateKey(new Date());
-      setSelectedDate(parseDate(key));
-      setDraftEntry(nextEntries.find((entry) => entry.date === key) ?? emptyDailyEntry(key));
-      setEntryDirty(false); setConfigDirty(false); setLoaded(true);
+      // A retry must never replace edits the user has not saved yet.
+      if (!entryDirtyRef.current) {
+        setSelectedDate(parseDate(key));
+        setDraftEntry(nextEntries.find((entry) => entry.date === key) ?? emptyDailyEntry(key));
+      }
+      setLoaded(true);
     } catch (error) { setLoadingError(error instanceof Error ? error.message : "Could not load Daily Log"); }
   }, [sessionStatus, dateReady]);
   useEffect(() => { void loadDailyLog(); }, [loadDailyLog]);
@@ -134,49 +160,58 @@ export default function DailyLogPage() {
   }, []);
 
   const persistEntry = useCallback(async (key: string, entry: DailyLogEntry) => {
+    const version = editVersionRef.current;
     const response = await fetch("/api/daily-log", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "save-entry", entry: { ...entry, date: key } }) });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error ?? "Failed to save entry");
     const saved = data.entry as DailyLogEntry;
     setEntries((current) => [saved, ...current.filter((old) => old.date !== key)].sort((a, b) => b.date.localeCompare(a.date)));
-    if (dateKey(selectedDate) === key) setDraftEntry(saved);
-    setEntryDirty(false); return saved;
-  }, [selectedDate]);
+    // Only mark the draft clean if the user has not typed since this save began
+    // and is still looking at the same date; otherwise keep their newer edits.
+    if (editVersionRef.current === version && draftRef.current.date === key) { setDraftEntry(saved); setEntryDirty(false); }
+    return saved;
+  }, []);
 
   const saveEntry = async () => {
-    setSaving(true); setNotice("");
-    try { if (configDirty) await persistConfig(flows); await persistEntry(selectedKey, draftEntry); setNotice("Entry saved to your Google account."); }
-    catch (error) { setNotice(error instanceof Error ? error.message : "Could not save entry"); }
-    finally { setSaving(false); }
+    if (savingRef.current || !loaded) return; // block duplicate submissions
+    savingRef.current = true; setSaving(true); setNotice(""); setSaveError("");
+    try { if (configDirty) await persistConfig(flows); await persistEntry(selectedKey, draftEntry); }
+    catch (error) { setSaveError(error instanceof Error ? error.message : "Could not save entry"); }
+    finally { savingRef.current = false; setSaving(false); }
   };
 
   const changeDate = async (nextDate: Date) => {
-    if (saving) return;
+    if (savingRef.current || !loaded) return;
     if (Number.isNaN(nextDate.getTime())) { setNotice("Choose a valid date."); return; }
     const nextKey = dateKey(nextDate); if (nextKey === selectedKey) return;
     if (entryDirty) {
-      setSaving(true);
+      // Unsaved edits are saved first; if that fails we stay on this date with the input intact.
+      savingRef.current = true; setSaving(true); setSaveError("");
       try { await persistEntry(selectedKey, draftEntry); }
-      catch (error) { setNotice(error instanceof Error ? error.message : "Save the current entry before changing dates."); setSaving(false); return; }
-      setSaving(false);
+      catch (error) { setSaveError(error instanceof Error ? error.message : "Save failed"); savingRef.current = false; setSaving(false); return; }
+      savingRef.current = false; setSaving(false);
+      if (entryDirtyRef.current) return; // user typed during the save: stay put, nothing is lost
     }
+    editVersionRef.current += 1;
     setSelectedDate(nextDate);
     setDraftEntry(entries.find((entry) => entry.date === nextKey) ?? emptyDailyEntry(nextKey));
-    setEntryDirty(false); setNotice(""); router.replace(`/daily-log?date=${nextKey}`, { scroll: false });
+    setEntryDirty(false); setNotice(""); setSaveError(""); router.replace(`/daily-log?date=${nextKey}`, { scroll: false });
   };
 
-  const updateNote = (flowId: string, value: string) => { setDraftEntry((entry) => ({ ...entry, notes: { ...entry.notes, [flowId]: value } })); setEntryDirty(true); setNotice(""); };
+  const updateNote = (flowId: string, value: string) => { editVersionRef.current += 1; setSaveError(""); setDraftEntry((entry) => ({ ...entry, notes: { ...entry.notes, [flowId]: value } })); setEntryDirty(true); setNotice(""); };
   const toggleCompletion = (flowId: string) => {
+    editVersionRef.current += 1; setSaveError("");
     setDraftEntry((entry) => { const ids = new Set(entry.completedFlowIds); if (ids.has(flowId)) ids.delete(flowId); else ids.add(flowId); return { ...entry, completedFlowIds: [...ids] }; });
     setEntryDirty(true); setNotice("");
   };
   const saveFlowConfig = async (nextFlows = flows) => {
     // Keep a retryable dirty state unless the server confirms persistence.
     // This also covers add/rename/reorder/archive/icon changes, not just plans.
-    setConfigDirty(true); setSaving(true); setNotice("");
+    if (savingRef.current) return;
+    savingRef.current = true; setConfigDirty(true); setSaving(true); setNotice("");
     try { await persistConfig(nextFlows); setNotice("Flow settings saved."); }
     catch (error) { setConfigDirty(true); const detail = error instanceof Error ? error.message : "Could not save flow settings"; setNotice(`${detail}. Your changes remain in this page; retry with Save Entry.`); }
-    finally { setSaving(false); }
+    finally { savingRef.current = false; setSaving(false); }
   };
   const renameFlow = async (flowId: string) => {
     const name = renameValue.trim(); if (!name) { setEditingFlowId(null); return; }
@@ -219,11 +254,18 @@ export default function DailyLogPage() {
     <header className={styles.pageHeader}>
       <div className={styles.pageHeading}><p className={styles.eyebrow}>☀ Daily Log</p><h1>Daily Log</h1><p className={styles.subtitle}>Track your daily activities. Add your own flows, mark them complete, and write notes.</p></div>
       <div className={styles.headerActions}>
-        <div className={styles.dateNav}><button type="button" aria-label="Previous day" disabled={saving} onClick={previousDay}><IconChevronLeft className={styles.tinyIcon} /></button><div role="button" tabIndex={0} className={styles.dateDisplay} onClick={() => { const picker = datePickerRef.current; if (!picker) return; try { if (typeof picker.showPicker === "function") { picker.showPicker(); return; } } catch { /* Fall back if the browser blocks showPicker(). */ } picker.click(); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); const picker = datePickerRef.current; if (!picker) return; try { if (typeof picker.showPicker === "function") { picker.showPicker(); return; } } catch { /* Fall back if the browser blocks showPicker(). */ } picker.click(); } }}><IconCalendar className={styles.tinyIcon} /><span>{formatDate(selectedDate)}</span><input ref={datePickerRef} type="date" value={selectedKey} onChange={(event) => { if (event.target.value) void changeDate(parseDate(event.target.value)); }} aria-label="Choose selected date" /></div><button type="button" aria-label="Next day" disabled={saving} onClick={nextDay}><IconChevronRight className={styles.tinyIcon} /></button></div>
+        <div className={styles.dateNav}><button type="button" aria-label="Previous day" disabled={saving || !loaded} onClick={previousDay}><IconChevronLeft className={styles.tinyIcon} /></button><div role="button" tabIndex={0} className={styles.dateDisplay} onClick={() => { const picker = datePickerRef.current; if (!picker) return; try { if (typeof picker.showPicker === "function") { picker.showPicker(); return; } } catch { /* Fall back if the browser blocks showPicker(). */ } picker.click(); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); const picker = datePickerRef.current; if (!picker) return; try { if (typeof picker.showPicker === "function") { picker.showPicker(); return; } } catch { /* Fall back if the browser blocks showPicker(). */ } picker.click(); } }}><IconCalendar className={styles.tinyIcon} /><span>{formatDate(selectedDate)}</span><input ref={datePickerRef} type="date" value={selectedKey} onChange={(event) => { if (event.target.value) void changeDate(parseDate(event.target.value)); }} aria-label="Choose selected date" /></div><button type="button" aria-label="Next day" disabled={saving || !loaded} onClick={nextDay}><IconChevronRight className={styles.tinyIcon} /></button></div>
+        <button type="button" className={styles.todayButton} onClick={goToday} disabled={saving || !loaded || isToday}>Today</button>
         <button type="button" className={styles.primaryButton} onClick={saveEntry} disabled={saving || !loaded}><IconDailyLog className={styles.actionIcon} /> {saving ? "Saving…" : "Save Entry"}</button>
         <div className={styles.overflowWrap} ref={overflowWrapRef}><button type="button" data-daily-overflow-toggle aria-label="More Daily Log actions" className={styles.overflowButton} aria-expanded={showOverflow} disabled={saving} onClick={() => setShowOverflow((value) => !value)}>⋮</button>{showOverflow && <div className={styles.overflowMenu} role="menu"><button type="button" role="menuitem" disabled={saving} onClick={() => { setShowOverflow(false); goToday(); }}>Go to today</button><button type="button" role="menuitem" disabled={saving} onClick={() => { setShowOverflow(false); router.push("/daily-log/history"); }}>View saved history</button></div>}</div>
       </div>
     </header>
+    <div className={styles.statusBar}>
+      <button type="button" className={`${styles.saveStatus} ${styles[`status_${saveState}`]}`} role="status" aria-live="polite" onClick={() => { if (saveState === "failed") void saveEntry(); }} disabled={saveState !== "failed"}>
+        <span className={styles.statusDot} aria-hidden="true" />{saveLabel}
+      </button>
+      {saveError && <span className={styles.statusDetail} role="alert">{saveError}. Your input is still here.</span>}
+    </div>
     {loadingError && <div className={styles.errorNotice} role="alert">{loadingError}<button type="button" onClick={() => void loadDailyLog()}>Retry</button></div>}
     {notice && <div className={styles.notice} role="status">{notice}</div>}
 
@@ -235,13 +277,20 @@ export default function DailyLogPage() {
           <button type="button" className={styles.addFlowButton} disabled={saving} onClick={() => setShowAddFlow(true)}><span>＋</span> Add Flow</button>
         </section>
 
+        <section className={styles.summaryCard} aria-label="Completion summary">
+          {daySummary.total === 0 ? <p className={styles.summaryEmpty}>No active flows to complete yet.</p> : <>
+            <p className={styles.summaryText}><strong>{daySummary.completed} / {daySummary.total}</strong> flows completed · {daySummary.percent}%{unsaved && <em> (unsaved)</em>}</p>
+            <div className={styles.progressTrack} role="progressbar" aria-valuemin={0} aria-valuemax={daySummary.total} aria-valuenow={daySummary.completed} aria-label="Flows completed"><span style={{ width: `${daySummary.percent}%` }} /></div>
+          </>}
+        </section>
+
         <section className={styles.flowSection} aria-label="Daily flows">
           <div className={`${styles.tableHeader} ${styles.flowGrid}`}><span aria-label="Drag handle column">#</span><span>Flow</span><span className={styles.centerHeading}>Today</span><span>My Notes</span><span /></div>
-          {!loaded ? <div className={styles.loadingState}>Loading your saved flows…</div> : activeFlows.length === 0 ? <div className={styles.emptyState}>No active flows yet. Add a flow to start tracking your day.</div> : activeFlows.map((flow) => <div className={`${styles.flowRow} ${styles.flowGrid}`} key={flow.id} id={`flow-${flow.id}`} onDragOver={(event) => event.preventDefault()} onDrop={() => void reorderFlow(flow.id)}>
+          {!loaded ? <div className={styles.loadingState}>Loading your saved flows…</div> : activeFlows.length === 0 ? <div className={styles.emptyState}>No active flows yet. Add a flow to start tracking your day.</div> : activeFlows.map((flow) => <div className={`${styles.flowRow} ${styles.flowGrid} ${completed.has(flow.id) ? styles.flowRowDone : ""}`} key={flow.id} id={`flow-${flow.id}`} onDragOver={(event) => event.preventDefault()} onDrop={() => void reorderFlow(flow.id)}>
             <div className={styles.dragCell}><button type="button" aria-label={`Drag to reorder ${flow.name}`} draggable={!saving} disabled={saving} onDragStart={() => setDraggedFlowId(flow.id)} onDragEnd={() => setDraggedFlowId(null)} className={styles.dragHandle}>⠿</button></div>
-            <div className={styles.flowIdentity}><span className={styles.flowIcon} style={{ color: flow.color, backgroundColor: `${flow.color}20` }}><FlowIcon icon={flow.icon} /></span>{editingFlowId === flow.id ? <form className={styles.renameForm} onSubmit={(event) => { event.preventDefault(); void renameFlow(flow.id); }}><input value={renameValue} autoFocus disabled={saving} onChange={(event) => setRenameValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Escape") setEditingFlowId(null); }} aria-label="Flow name" /><button type="submit" disabled={saving}>Save</button></form> : <span className={styles.flowName}>{flow.name}</span>}</div>
-            <div className={styles.todayCell}><input type="checkbox" aria-label={`Mark ${flow.name} complete for ${formatDate(selectedDate)}`} disabled={saving} checked={completed.has(flow.id)} onChange={() => toggleCompletion(flow.id)} /></div>
-            <div className={styles.notesCell}><textarea rows={1} aria-label={`${flow.name} notes for ${formatDate(selectedDate)}`} disabled={saving} value={draftEntry.notes[flow.id] ?? ""} maxLength={500} placeholder={flow.id === "flow-general-notes" ? "What went good today? What can improve?" : `e.g. ${flow.name === "DSA" ? "Arrays, Sorting, 5 questions…" : flow.name === "Anime / Movie" ? "One Piece Ep 100–102…" : flow.name === "Workout" ? "Gym - Chest + Triceps" : flow.name === "Skill" ? "Web Dev, React Hooks…" : flow.name === "Calories" ? "2079 / 2510, Meals…" : "Add today's notes…"}`} onChange={(event) => updateNote(flow.id, event.target.value)} /></div>
+            <div className={styles.flowIdentity}><span className={styles.flowIcon} style={{ color: flow.color, backgroundColor: `${flow.color}20` }}><FlowIcon icon={flow.icon} /></span>{editingFlowId === flow.id ? <form className={styles.renameForm} onSubmit={(event) => { event.preventDefault(); void renameFlow(flow.id); }}><input value={renameValue} autoFocus disabled={saving} onChange={(event) => setRenameValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Escape") setEditingFlowId(null); }} aria-label="Flow name" /><button type="submit" disabled={saving}>Save</button></form> : <span className={styles.flowName} title={flow.name}>{flow.name}</span>}</div>
+            <div className={styles.todayCell}><input type="checkbox" aria-label={`Mark ${flow.name} complete for ${formatDate(selectedDate)}`} checked={completed.has(flow.id)} onChange={() => toggleCompletion(flow.id)} /></div>
+            <div className={styles.notesCell}><textarea rows={1} aria-label={`${flow.name} notes for ${formatDate(selectedDate)}`} value={draftEntry.notes[flow.id] ?? ""} maxLength={500} placeholder={flow.id === "flow-general-notes" ? "What went good today? What can improve?" : `e.g. ${flow.name === "DSA" ? "Arrays, Sorting, 5 questions…" : flow.name === "Anime / Movie" ? "One Piece Ep 100–102…" : flow.name === "Workout" ? "Gym - Chest + Triceps" : flow.name === "Skill" ? "Web Dev, React Hooks…" : flow.name === "Calories" ? "2079 / 2510, Meals…" : "Add today's notes…"}`} onChange={(event) => updateNote(flow.id, event.target.value)} /></div>
             <div className={styles.actionCell} ref={menuFlowId === flow.id ? openRowMenuRef : undefined}><button type="button" data-daily-flow-toggle aria-label={`Actions for ${flow.name}`} aria-expanded={menuFlowId === flow.id} className={styles.rowAction} disabled={saving} onClick={() => setMenuFlowId((current) => current === flow.id ? null : flow.id)}>⋮</button>{menuFlowId === flow.id && <div className={styles.rowMenu} role="menu"><button type="button" role="menuitem" disabled={saving} onClick={() => { setEditingFlowId(flow.id); setRenameValue(flow.name); setMenuFlowId(null); }}>Rename flow</button><button type="button" role="menuitem" disabled={saving} onClick={() => void cycleIcon(flow)}>Change icon/color</button><button type="button" role="menuitem" disabled={saving} className={styles.dangerAction} onClick={() => void archiveFlow(flow)}>Delete flow</button></div>}</div>
           </div>)}
           <button type="button" className={styles.addNewFlow} disabled={saving} onClick={() => setShowAddFlow(true)}><span>＋</span> Add New Flow</button>
