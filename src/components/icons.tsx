@@ -30,16 +30,6 @@ export function IconTasks({ className = "" }: { className?: string }) {
   );
 }
 
-export function IconSkills({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className={className}>
-      <circle cx="12" cy="12" r="8" />
-      <circle cx="12" cy="12" r="4.2" />
-      <circle cx="12" cy="12" r="0.9" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
 export function IconWidgets({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className={className}>

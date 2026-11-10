@@ -7,7 +7,6 @@ import {
   notificationsEnabled,
   checkUpcomingEvents,
   checkOverdueTasks,
-  checkStreakBreaks,
 } from "@/lib/notifications";
 
 const CHECK_INTERVAL_MS = 60 * 1000; // once a minute is enough for a 10-min-ahead reminder
@@ -32,19 +31,16 @@ export function PwaRuntime() {
     const runChecks = async () => {
       if (!notificationsEnabled()) return;
       try {
-        const [eventsRes, tasksRes, skillsRes] = await Promise.all([
+        const [eventsRes, tasksRes] = await Promise.all([
           fetch("/api/events"),
           fetch("/api/tasks"),
-          fetch("/api/skills"),
         ]);
-        const [eventsData, tasksData, skillsData] = await Promise.all([
+        const [eventsData, tasksData] = await Promise.all([
           eventsRes.json(),
           tasksRes.json(),
-          skillsRes.json(),
         ]);
         if (eventsRes.ok) checkUpcomingEvents(eventsData.events ?? []);
         if (tasksRes.ok) checkOverdueTasks(tasksData.tasks ?? []);
-        if (skillsRes.ok) checkStreakBreaks(skillsData.skills ?? []);
       } catch {
         // Silent — notification checks should never surface errors to the user.
       }

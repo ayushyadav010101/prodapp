@@ -7,14 +7,12 @@ import {
   IconArrowRight,
   IconCalendar,
   IconTasks,
-  IconTrophy,
   IconSettings,
 } from "@/components/icons";
 import {
   useCalendarData,
   useEventCheckInsData,
   useTasksData,
-  useSkillsData,
   useLevelFromData,
   dedupeCalendarEvents,
 } from "@/lib/use-google-data";
@@ -33,7 +31,6 @@ export default function HomePage() {
   const { events, error: calError, refresh: refreshEvents } = useCalendarData();
   const { checkedInKeys: eventCheckInKeys } = useEventCheckInsData();
   const { tasks, taskLists, error: taskError, refresh: refreshTasks } = useTasksData();
-  const { skills } = useSkillsData();
   const [mounted, setMounted] = useState(false);
   const [now, setNow] = useState(() => new Date());
 
@@ -50,7 +47,6 @@ export default function HomePage() {
 
   const today = now;
   const todayKey = today.toDateString();
-  const todayIso = localDateKey(today);
   const dateStr = today.toLocaleDateString(undefined, {
     weekday: "long",
     day: "numeric",
@@ -89,25 +85,9 @@ export default function HomePage() {
     [tasks, myTasksListId]
   );
 
-  const todayChallenges = useMemo(
-    () =>
-      skills.filter((skill) => {
-        const start = new Date(skill.startDate);
-        if (Number.isNaN(start.getTime())) return false;
-        const startDay = new Date(start);
-        startDay.setHours(0, 0, 0, 0);
-        const endDay = new Date(startDay);
-        endDay.setDate(endDay.getDate() + skill.durationDays);
-        const todayStart = new Date(today);
-        todayStart.setHours(0, 0, 0, 0);
-        return todayStart >= startDay && todayStart < endDay;
-      }),
-    [skills, todayKey]
-  );
 
   // The Home card treats the entire My Tasks list as today's workload.
   const todayTaskCount = todaysTasks.length;
-  const challengeCount = todayChallenges.length;
 
   const todayEventKeys = useMemo(
     () =>
@@ -127,11 +107,10 @@ export default function HomePage() {
 
   const completedEventsToday = todayEventKeys.filter((key) => eventCheckInKeys.includes(key)).length;
   const completedTasksToday = todaysTasks.filter((t) => t.status === "completed").length;
-  const completedChallengesToday = todayChallenges.filter((s) => s.completedDates.includes(todayIso)).length;
-  const progressTotal = todayEventKeys.length + todaysTasks.length + todayChallenges.length;
-  const progressCompleted = completedEventsToday + completedTasksToday + completedChallengesToday;
+  const progressTotal = todayEventKeys.length + todaysTasks.length;
+  const progressCompleted = completedEventsToday + completedTasksToday;
   const todayProgress = progressTotal > 0 ? Math.min(100, Math.round((progressCompleted / progressTotal) * 100)) : 0;
-  const { level } = useLevelFromData(events, tasks, skills);
+  const { level } = useLevelFromData(events, tasks);
   if (status === "unauthenticated") {
     return (
       <div className="max-w-md mx-auto px-6 py-16 text-center">
@@ -200,7 +179,7 @@ export default function HomePage() {
               />
             </div>
             <p className="mt-1.5 text-[10px] sm:text-xs text-ink-soft">
-              {progressTotal > 0 ? `${progressCompleted} of ${progressTotal} done today` : "No tasks, events, or challenges today"}
+              {progressTotal > 0 ? `${progressCompleted} of ${progressTotal} done today` : "No tasks or events today"}
             </p>
           </div>
 
@@ -227,13 +206,7 @@ export default function HomePage() {
             count={todayTaskCount}
             noun={todayTaskCount === 1 ? "task" : "tasks"}
           />
-          <HomeCountCard
-            href="/skills"
-            icon={<IconTrophy className="w-6 h-6 sm:w-7 sm:h-7" />}
-            label="Challenges"
-            count={challengeCount}
-            noun={challengeCount === 1 ? "challenge" : "challenges"}
-          />
+
         </div>
       </div>
 
@@ -266,7 +239,6 @@ export default function HomePage() {
         <div className="hidden sm:flex px-4 sm:px-5 md:px-6 pb-3.5 sm:pb-4 text-[10px] sm:text-xs text-ink-soft flex-wrap gap-x-4 gap-y-1.5">
           <span>{completedTasksToday} task{completedTasksToday === 1 ? "" : "s"} completed today</span>
           <span>{completedEventsToday} event{completedEventsToday === 1 ? "" : "s"} checked in</span>
-          <span>{completedChallengesToday} challenge check-in{completedChallengesToday === 1 ? "" : "s"}</span>
         </div>
       </section>
     </div>

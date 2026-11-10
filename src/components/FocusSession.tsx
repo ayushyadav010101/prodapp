@@ -344,7 +344,7 @@ export function FocusSession() {
           <section className="min-h-0 rounded-2xl border-2 border-rule bg-paper p-3 md:p-3.5">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-accent">ZenSpace</p>
+                
                 <h2 className="mt-1 font-serif text-2xl font-semibold tracking-tight md:text-[2rem]">Focus Session</h2>
                 <p className="mt-0.5 text-xs text-ink-soft">Stay consistent, build a better you.</p>
               </div>

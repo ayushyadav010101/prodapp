@@ -1,7 +1,7 @@
 {
   "name": "conflict-calendar",
   "short_name": "conflict",
-  "description": "Calendar, Tasks & Skills, synced with Google",
+  "description": "Calendar, Tasks & Daily Log, synced with Google",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f4f1ea",

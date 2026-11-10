@@ -125,37 +125,6 @@ export function useTasksData() {
   return { taskLists, tasks, todayTaskIds, syncState, error, refresh };
 }
 
-export function useSkillsData() {
-  const { status: sessionStatus } = useSession();
-  const [skills, setSkills] = useState<
-    { id: string; name: string; durationDays: number; startDate: string; completedDates: string[] }[]
-  >([]);
-  const [syncState, setSyncState] = useState<SyncState>("idle");
-  const [error, setError] = useState<string | null>(null);
-
-  const refresh = useCallback(async () => {
-    if (sessionStatus !== "authenticated") return;
-    setSyncState("syncing");
-    setError(null);
-    try {
-      const res = await fetch("/api/skills");
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed to load skills");
-      setSkills(data.skills ?? []);
-      setSyncState("idle");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown sync error");
-      setSyncState("error");
-    }
-  }, [sessionStatus]);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  return { skills, syncState, error, refresh };
-}
-
 // Level = one point per distinct day with any real activity. The set of
 // qualifying days is ALSO permanently logged to a hidden Google Task list
 // (see level-sync.ts): live data (the calendar's rolling fetch window, or a
@@ -164,16 +133,15 @@ export function useSkillsData() {
 // permanent log guarantees Level only ever grows.
 //
 // This variant takes data the caller has ALREADY fetched, so pages that
-// already load events/tasks/skills/sessions (like Home) don't fetch them twice.
+// already load events/tasks/sessions (like Home) don't fetch them twice.
 export function useLevelFromData(
   events: GoogleEvent[],
   tasks: GoogleTask[],
-  skills: { id: string; name: string; durationDays: number; startDate: string; completedDates: string[] }[]
 ) {
   const { status: sessionStatus } = useSession();
   const [loggedDays, setLoggedDays] = useState<string[]>([]);
 
-  const liveActiveDates = computeActiveDates(events, tasks, skills);
+  const liveActiveDates = computeActiveDates(events, tasks);
   const liveKey = JSON.stringify(Array.from(liveActiveDates).sort());
   const loggedKey = JSON.stringify(loggedDays);
 
@@ -219,6 +187,5 @@ export function useLevelFromData(
 export function useLevel() {
   const { events } = useCalendarData();
   const { tasks } = useTasksData();
-  const { skills } = useSkillsData();
-  return useLevelFromData(events, tasks, skills);
+  return useLevelFromData(events, tasks);
 }

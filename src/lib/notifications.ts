@@ -85,11 +85,6 @@ interface TaskLike {
   due?: string;
 }
 
-interface SkillLike {
-  id: string;
-  name: string;
-  completedDates: string[];
-}
 
 // Notifies for events starting within the next 10 minutes.
 export function checkUpcomingEvents(events: EventLike[]) {
@@ -131,28 +126,6 @@ export function checkOverdueTasks(tasks: TaskLike[]) {
     const key = `overdue:${task.id}:${todayKey}`;
     if (notified.has(key)) continue;
     fireNotification("Overdue task", task.title || "Untitled task", key, "/tasks");
-    markNotified(key);
-  }
-}
-
-// Warns once per day, in the evening, about skills at risk of breaking streak.
-export function checkStreakBreaks(skills: SkillLike[]) {
-  const now = new Date();
-  if (now.getHours() < 20) return; // only warn in the evening
-  const todayStr = now.toDateString();
-  const todayKey8601 = now.toISOString().slice(0, 10);
-  const notified = getNotifiedSet();
-
-  for (const skill of skills) {
-    if (skill.completedDates.includes(todayKey8601)) continue;
-    const key = `streak:${skill.id}:${todayStr}`;
-    if (notified.has(key)) continue;
-    fireNotification(
-      "Streak at risk",
-      `You haven't checked in on "${skill.name}" today — don't break the streak.`,
-      key,
-      "/skills"
-    );
     markNotified(key);
   }
 }

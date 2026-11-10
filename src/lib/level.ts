@@ -7,10 +7,6 @@ interface TaskLike {
   status: string;
   completed?: string;
 }
-interface SkillLike {
-  startDate?: string;
-  completedDates: string[];
-}
 function localDateKey(d: Date): string {
   return d.toDateString();
 }
@@ -19,14 +15,12 @@ function localDateKey(d: Date): string {
  * One level per calendar day with real activity, never counting future work.
  *
  * Calendar events count for the day they occur (including today), while
- * completed tasks and skill check-ins count from their
- * actual completion/check-in timestamp. Future events are deliberately ignored
+ * completed tasks count from their actual completion timestamp. Future events are deliberately ignored
  * so a calendar full of upcoming/recurring items cannot inflate the level.
  */
 export function computeActiveDates(
   events: EventLike[],
-  tasks: TaskLike[],
-  skills: SkillLike[]
+  tasks: TaskLike[]
 ): Set<string> {
   const active = new Set<string>();
   const now = new Date();
@@ -35,14 +29,6 @@ export function computeActiveDates(
   // boundary. This prevents an existing Google Calendar history from
   // instantly turning into dozens of levels on first sign-in.
   const appActivityTimes: number[] = [];
-  for (const s of skills) {
-    const t = new Date(s.startDate ?? "");
-    if (!Number.isNaN(t.getTime()) && t.getTime() <= now.getTime()) appActivityTimes.push(t.getTime());
-    for (const d of s.completedDates) {
-      const t = new Date(`${d}T00:00:00`);
-      if (!Number.isNaN(t.getTime()) && t.getTime() <= now.getTime()) appActivityTimes.push(t.getTime());
-    }
-  }
   for (const t of tasks) {
     if (t.status === "completed" && t.completed) {
       const d = new Date(t.completed);
@@ -76,14 +62,6 @@ export function computeActiveDates(
     }
   }
 
-  for (const s of skills) {
-    for (const d of s.completedDates) {
-      const date = new Date(`${d}T00:00:00`);
-      if (!Number.isNaN(date.getTime()) && date.getTime() <= now.getTime()) {
-        active.add(localDateKey(date));
-      }
-    }
-  }
 
   return active;
 }

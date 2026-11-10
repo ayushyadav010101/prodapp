@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { localDateKey } from "@/lib/event-checkins";
 import { listTaskLists, listTasks, insertTask, GoogleApiError } from "@/lib/google-api";
-import { SKILLS_LIST_TITLE } from "@/lib/skills-sync";
 import { LEVEL_LOG_LIST_TITLE } from "@/lib/level-sync";
 import { EVENT_CHECKIN_LIST_TITLE } from "@/lib/event-checkins";
 import { DAILY_LOG_LIST_TITLE } from "@/lib/daily-log";
@@ -28,11 +27,10 @@ export async function GET() {
 
   try {
     const allLists = await listTaskLists(session.accessToken);
-    // The Skill Challenges list is internal to the Skills feature — don't
-    // surface it as a regular task category here.
+    // Keep the retired feature's old Google Task list hidden; its data is left untouched in Google.
     const taskLists = allLists.filter(
       (l) =>
-        l.title !== SKILLS_LIST_TITLE &&
+        l.title !== "Skill Challenges (Productivity App)" &&
         l.title !== LEVEL_LOG_LIST_TITLE &&
         l.title !== EVENT_CHECKIN_LIST_TITLE &&
         l.title !== TODAY_TASK_LOG_LIST_TITLE &&
